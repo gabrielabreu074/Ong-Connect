@@ -103,11 +103,6 @@ footer{
 }
 .esquerda-footer img{
   height: 50px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.esquerda-footer img:hover{
-  transform: scale(1.2);
 }
 .esquerda-footer h4{
   padding-top: 11px;

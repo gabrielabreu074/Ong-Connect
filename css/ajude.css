@@ -258,11 +258,6 @@ footer{
 }
 .esquerda img{
   height: 50px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.esquerda img:hover{
-  transform: scale(1.2)
 }
 .esquerda h4{
   padding-top: 12px;

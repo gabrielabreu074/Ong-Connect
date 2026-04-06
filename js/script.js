@@ -30,10 +30,10 @@ document.querySelectorAll("a").forEach(link => {
 });
 
 const imagens = [
-    "/assets/Homeimg.webp",
-    "/assets/grupo.luta.png",
-    "/assets/casasantagemma.jpg",
-    "/assets/Cachorro.webp"
+    "/Ong-Connect/assets/Homeimg.webp",
+    "/Ong-Connect/assets/grupo.luta.png",
+    "/Ong-Connect/assets/casasantagemma.jpg",
+    "/Ong-Connect/assets/Cachorro.webp"
 ];
 
 let index = 0;

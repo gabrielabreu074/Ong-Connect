@@ -57,8 +57,12 @@ body{
 }
 .esquerda{
   background-color: rgb(255, 255, 255);
-  width: 45%;
+  width: 36%;
   height: 500px;
+  border-radius: 15px;
+}
+.esquerda img{
+  width: 666px;
   border-radius: 15px;
 }
 .direita{
@@ -70,10 +74,12 @@ body{
   box-shadow: -10px 7px 10px rgba(82, 78, 78, 0.692);
 }
 .direita h1{
-  margin-top: 10px;
+  margin-top: 15px;
   display: flex;
   justify-content: center;
-
+  font-family: "Questrial", sans-serif;
+  font-weight: 600;
+  font-size: 32px;
 }
 .direita p{
   margin-top: 15px;
@@ -81,8 +87,8 @@ body{
   justify-content: center;
   font-family: "Questrial", sans-serif;
   margin-left: 5px;
-  font-size: 29px;
-  line-height: 29px;
+  font-size: 25px;
+  padding: 20px;
 
 }
 /*footer*/
@@ -103,12 +109,8 @@ footer{
 }
 .esquerda-footer img{
   height: 50px;
-  cursor: pointer;
-  transition: 0.2s;
 }
-.esquerda-footer img:hover{
-  transform: scale(1.2);
-}
+
 .esquerda-footer h4{
   padding-top: 11px;
   font-family: "Questrial", sans-serif;

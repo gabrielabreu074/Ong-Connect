@@ -82,11 +82,6 @@ button{
 .botao-apa{
   transition: 0.1;
 }
-.botao-apa:hover{
-  transform: 1.1;
-  background-color: rgb(124, 8, 8);
-}
-
 
 .casa{
   height: 350px;
@@ -245,11 +240,6 @@ footer{
  
 .esquerda img{
   height: 50px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.esquerda img:hover{
-  transform: scale(1.2);
 }
 .esquerda h4{
   padding-top: 11px;
