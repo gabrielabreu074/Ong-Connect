@@ -1,0 +1,287 @@
+*{
+    margin: 0%;
+    padding: 0%;
+    box-sizing: border-box;
+}
+
+header{
+  background-color: #2f5d2f;
+  color: rgb(233, 233, 223);
+  display: flex;
+  align-items: center;
+  padding: 10px 40px;
+}
+body{
+  background-color: beige;
+}
+.logo-area img{
+  width: 100px;
+}
+
+.menu{
+  display: flex;
+  gap: 30px;
+  width: 400px;
+  margin-left: 50px;
+}
+
+
+
+.menu a{
+  text-decoration: none;
+  color: white;
+  font-size: 33px;
+  font-family: "Questrial", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  transition: 0.3s;
+}
+
+
+.menu a:hover{
+  transform: scale(1.4);
+}
+
+.texto{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Questrial", sans-serif;
+  margin-top: 100px;
+  background-color: #397038;
+  color:white;
+  width: 790px;
+  height: 66px;
+  margin-left: 28%;
+  border-radius: 7px;
+  font-size: 20px;
+
+
+}
+.texto h2{
+  margin-left: 9px;
+}
+.container-qr{
+  display: flex;
+  align-items: center;
+  margin-left: 62px;
+  margin-top: 100px;
+  gap: 150px;
+}
+.container-qr button a{
+  text-decoration: none;
+  color: white;  
+}
+.casa{
+  height: 350px;
+  width: 240px;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center; 
+  padding-top: 120px;
+  border-radius: 7px;
+  transition: 1.0s;
+  font-family: "Questrial", sans-serif;
+  font-size: 24px;
+
+  box-shadow: 0px 4px 10px rgba(112, 110, 110, 0.692); 
+}
+.casa:hover{
+  transform: scale(1.2);
+  box-shadow: 0px 10px 20px rgba(0,0,0,0.3);
+}
+.casa img{
+  width: 180px;
+  margin-top: -140px;
+}
+.casa p{
+  margin-top: 10px;
+}
+.casa h6{
+  font-size: 13px;
+  margin-left: 14px;
+}
+.apa{
+  height: 350px;
+  width: 240px;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center; /* topo */
+  padding-top: 120px;
+  border-radius: 7px;
+  transition: 1.3s;
+  font-family: "Questrial", sans-serif;
+  font-size: 26px;
+
+  box-shadow: 0px 4px 10px rgba(112, 110, 110, 0.692); 
+}
+.apa:hover{
+  transform: scale(1.2);
+  box-shadow: 0px 10px 20px rgba(0,0,0,0.3);
+}
+.apa img{
+  width: 180px;
+  margin-top: -140px;
+}
+.apa p{
+  margin-top: 10px;
+}
+.apa h6{
+  font-size: 13px;
+  margin-left: 30px;
+}
+.glpv{
+  height: 350px;
+  width: 240px;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center; /* topo */
+  padding-top: 120px;
+  border-radius: 7px;
+  transition: 1.3s;
+  font-family: "Questrial", sans-serif;
+  font-size: 25px;
+
+  box-shadow: 0px 4px 10px rgba(112, 110, 110, 0.692); 
+}
+.glpv:hover{
+  transform: scale(1.2);
+  box-shadow: 0px 10px 20px rgba(0,0,0,0.3);
+}
+.glpv img{
+  width: 180px;
+  margin-top: -140px;
+}
+.glpv p{
+  margin-top: 10px;
+}
+.glpv h6{
+  font-size: 13px;
+  margin-left: 25px;
+}
+.sal{
+  height: 350px;
+  width: 240px;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center; /* topo */
+  padding-top: 120px;
+  border-radius: 7px;
+  transition: 1.3s;
+  font-family: "Questrial", sans-serif;
+  font-size: 24px;
+
+  box-shadow: 0px 4px 10px rgba(112, 110, 110, 0.692); 
+}
+.sal:hover{
+  transform: scale(1.2);
+  box-shadow: 0px 10px 20px rgba(0,0,0,0.3);
+}
+.sal img{
+  width: 180px;
+  margin-top: -140px;
+}
+.sal p{
+  margin-top: 10px;
+}
+.sal h6{
+  margin-left: 25px;
+  font-size: 13px;
+}
+.pontes{
+  height: 350px;
+  width: 240px;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center; /* topo */
+  padding-top: 120px;
+  border-radius: 7px;
+  transition: 1.3s;
+  font-family: "Questrial", sans-serif;
+  font-size: 26px;
+
+  box-shadow: 0px 4px 10px rgba(112, 110, 110, 0.692); 
+}
+.pontes:hover{
+  transform: scale(1.2);
+  box-shadow: 0px 10px 20px rgba(0,0,0,0.3);
+}
+.pontes img{
+  width: 180px;
+  margin-top: -140px;
+}
+.pontes p{
+  margin-top: 10px;
+}
+.pontes h6{
+  margin-left: 25px;
+  font-size: 13px;
+}
+.container-qr button{
+  margin-top: 25px;
+  width: 140px;
+  height: 33px;
+  border-radius: 7px;
+  font-family: "Questrial", sans-serif;
+  background-color: #035707ea;
+  box-shadow:0 2px 6px rgba(0,0,0,0.2);
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 20px
+}
+/*footer*/
+footer{
+  background-color: #2f5d2f;
+  margin-top:105px;
+  display: flex;
+  height: 100px;
+  align-items: center;
+  padding: 0px 20px;
+  color: white;
+}
+ 
+.esquerda{
+  display: flex;
+  gap: 20px;
+ 
+}
+.esquerda img{
+  height: 50px;
+}
+.esquerda h4{
+  padding-top: 12px;
+  font-family: "Questrial", sans-serif;
+  font-size: 25px;
+  font-weight: 200;
+}
+.direita img{
+  height: 50px;
+  transition:0.2s;
+  cursor: pointer;
+}
+.direita img:hover{
+  transform: scale(1.2);
+}
+.direita{
+  display: flex;
+  gap: 20px;
+  margin-left: auto;
+}
+.direita h4{
+  padding: 11px;
+  font-family: "Questrial", sans-serif;
+  font-size: 25px;
+  font-weight: 200;
+}
+/*fim footer*/
