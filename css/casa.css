@@ -75,6 +75,28 @@ body{
 
 }
 
+.hero h1{
+    animation: zoom 1.6s ease;
+}
+
+@keyframes zoom {
+    0% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.2);
+    }
+    50% {
+        transform: scale(1);
+    }
+    75% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
 .direita1{
   width: 50%;
   height: 500px;
