@@ -6,7 +6,6 @@
 body{
   font-family: Arial, Helvetica, sans-serif;
   background-color: beige;
-  overflow: hidden;
 }
 
 
@@ -59,23 +58,97 @@ h1{
     justify-content: center;
     margin-top: 70px;
     font-family: "Questrial", sans-serif;
+    font-weight: 500;
+    font-size: 60px;
+    color: rgb(146, 114, 9);
+}
+h3{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    font-family: "Questrial", sans-serif;
     font-weight: 400;
-    font-size: 40px;
+    font-size: 24px;
 }
 form{
     display: flex;
     flex-direction: column;
-    width: 550px;
+    width: 40%;
     justify-content: center;
     margin-top: 100px;
-    gap: 60px;
+    gap: 30px;
+    background-color:#2f5d2f;
+    border-radius: 15px;
+    height: 78%;
 }
 form input{
-    height: 30px;
+  margin-top: 10px;
+    height: 60px;
+    width: 95%;
+    border: none;
+    background-color: rgba(197, 197, 197, 0.671);
+    font-family: "Questrial", sans-serif;
+    border-radius: 10px;
+  }
+input::placeholder {
+  color: rgb(255, 255, 255);
+  padding: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 17px;
+  font-weight: 400;
 }
-.ONGs{
-    height: 30px;
+nav label{
+  font-family: "Questrial", sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  color: white;
 }
-.env{
-    margin-top: 100px;
+main nav{
+  display: flex;
+  flex-direction: column;
+  padding: 3%;
+  padding-left: 6%;
+}
+input:focus {
+    outline: none;
+    border: solid 2px #4f754f;
+}
+
+select {
+    height: 100px;
+    width: 95%;
+    border: solid 1px black;
+    background-color: rgba(197, 197, 197, 0.671);
+    color: white;
+    font-family:"Questrial", sans-serif ;
+    border: solid 1px rgb(182, 181, 180);
+    border-radius: 10px;
+}
+option{
+  color: black;
+}
+select:focus {
+    outline: none;
+    border: solid 2px #4f754f;
+}
+
+.ONGs {
+    height: 40px;
+}
+.env {
+    width: 85%;
+    height: 50px;
+    margin-left: 40px;
+    background-color: #4f754f;
+    border: none;
+    border-radius: 15px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    font-size: 17px;
+    font-family:"Questrial", sans-serif ;
+}
+.env:hover {
+    background-color: black;
+    transform: scale(1.02);
 }
