@@ -85,14 +85,18 @@ form{
 form input{
     height: 60px;
     width: 95%;
-    border: none;
     background-color: rgba(197, 197, 197, 0.671);
     font-family: "Questrial", sans-serif;
     border-radius: 10px;
   }
 input::placeholder {
+<<<<<<< HEAD
   color: rgb(0, 0, 0);
   font-family: "Questrial", sans-serif;
+=======
+  color: rgb(255, 255, 255);
+  font-family:"Questrial", sans-serif;
+>>>>>>> ea5ffa89271d25410c029eaa6cfcb6ce63fc2032
   font-size: 17px;
   font-weight: 400;
 }
@@ -109,7 +113,7 @@ main nav{
   padding-left: 6%;
   gap: 10px;
 }
-input:focus {
+input, textarea:focus {
     outline: none;
     border: solid 2px #4f754f;
 }
@@ -161,4 +165,16 @@ input[value=""] {
 .env:hover {
     background-color: black;
     transform: scale(1.02);
+}
+
+textarea{
+  background-color: rgba(197, 197, 197, 0.671);
+  width: 95%;
+  border-radius: 15px;
+  padding: 1%;
+  border: none;
+  color: white;
+  font-family: "Questrial", sans-serif;
+  font-size: 17px;
+  resize: none;
 }
