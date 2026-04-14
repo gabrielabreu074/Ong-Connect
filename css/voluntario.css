@@ -50,8 +50,9 @@ body{
 main {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    height: 120%;
+    align-items: center;     /* horizontal */
+    height: calc(100vh - 80px); /* altura da tela menos o header */
+    height: 1200px  ;
 }
 h1{
     display: flex;
@@ -89,8 +90,13 @@ form input{
     border-radius: 10px;
   }
 input::placeholder {
+<<<<<<< HEAD
+  color: rgb(0, 0, 0);
+  font-family: "Questrial", sans-serif;
+=======
   color: rgb(255, 255, 255);
   font-family:"Questrial", sans-serif;
+>>>>>>> ea5ffa89271d25410c029eaa6cfcb6ce63fc2032
   font-size: 17px;
   font-weight: 400;
 }
@@ -117,11 +123,12 @@ select {
     width: 95%;
     border: solid 1px black;
     background-color: rgba(197, 197, 197, 0.671);
-    color: white;
+    color: black;
     font-family:"Questrial", sans-serif ;
     border: solid 1px rgb(182, 181, 180);
     border-radius: 10px;
 }
+
 option{
   color: black;
 
