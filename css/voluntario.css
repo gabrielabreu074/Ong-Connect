@@ -50,9 +50,8 @@ body{
 main {
     display: flex;
     flex-direction: column;
-    align-items: center;     /* horizontal */
-    height: calc(100vh - 80px); /* altura da tela menos o header */
-    height: 1200px  ;
+    align-items: center;
+    height: 120%;
 }
 h1{
     display: flex;
@@ -85,14 +84,13 @@ form{
 form input{
     height: 60px;
     width: 95%;
-    border: none;
     background-color: rgba(197, 197, 197, 0.671);
     font-family: "Questrial", sans-serif;
     border-radius: 10px;
   }
 input::placeholder {
   color: rgb(255, 255, 255);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:"Questrial", sans-serif;
   font-size: 17px;
   font-weight: 400;
 }
@@ -109,7 +107,7 @@ main nav{
   padding-left: 6%;
   gap: 10px;
 }
-input:focus {
+input, textarea:focus {
     outline: none;
     border: solid 2px #4f754f;
 }
@@ -160,4 +158,16 @@ input[value=""] {
 .env:hover {
     background-color: black;
     transform: scale(1.02);
+}
+
+textarea{
+  background-color: rgba(197, 197, 197, 0.671);
+  width: 95%;
+  border-radius: 15px;
+  padding: 1%;
+  border: none;
+  color: white;
+  font-family: "Questrial", sans-serif;
+  font-size: 17px;
+  resize: none;
 }
