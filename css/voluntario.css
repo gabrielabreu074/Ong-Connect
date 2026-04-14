@@ -90,13 +90,10 @@ form input{
     border-radius: 10px;
   }
 input::placeholder {
-<<<<<<< HEAD
   color: rgb(0, 0, 0);
   font-family: "Questrial", sans-serif;
-=======
   color: rgb(255, 255, 255);
-  font-family:"Questrial", sans-serif;
->>>>>>> ea5ffa89271d25410c029eaa6cfcb6ce63fc2032
+  font-family:"Questrial", sans-serif ;
   font-size: 17px;
   font-weight: 400;
 }
