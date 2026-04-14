@@ -124,6 +124,7 @@ select {
 }
 option{
   color: black;
+
 }
 select:focus {
     outline: none;
@@ -132,6 +133,7 @@ select:focus {
 
 select {
   font-size: 20px;
+  padding-left: 2%;
 }
 
 input[value=""] {
