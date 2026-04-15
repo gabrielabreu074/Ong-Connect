@@ -45,6 +45,25 @@ body{
 .menu a:hover{
   transform: scale(1.4);
 }
+
+.menuh{
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-family: "Questrial", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  display: none;
+  font-size: 55px;
+  margin-top: 25px;
+}
+
+
+
+.navh{
+  display: flex;
+}
 /*FIM HEADER*/
 
 
@@ -92,7 +111,7 @@ body{
   height: 500px;
   border-radius: 15px;
 }
-button{
+.serv{
   margin-left: 50%;
   margin-top: 58px;
   width: 220px;
@@ -107,7 +126,7 @@ button{
   transition: 0.2s;
   box-shadow: -8px 7px 10px rgba(134, 130, 130, 0.692);
 }
-button:hover{
+.serv:hover{
   transform:scale(1.2);
 }
 /*footer*/
@@ -157,3 +176,166 @@ footer{
   font-size: 25px;
   font-weight: 200;
 }
+
+
+
+@media screen and (max-width: 430px) {
+  .container{
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+  }
+
+  .logo-area img{
+  margin-left: -35px;
+  }
+
+  .direita{
+    width: 90%;
+    margin-right: 25px;
+  }
+
+  .esquerda img{
+    width: 100%;
+    height: 100%;
+    margin: 0px
+  }
+
+  .esquerda{
+    width: 320px;
+    height: 200px;
+    margin-right: 20px;
+  }
+
+  .esquerda img{
+    height: 200px;
+  }
+  
+  .direita p{
+    font-size: 18px;
+  }
+
+  .serv{
+    margin-left: 25%;
+    margin-top: 50px;
+
+  }
+
+  footer{
+    gap: 50px;
+  }
+
+
+
+
+  .menu{
+    position: absolute;
+    top: 80px;
+    right: 0;
+    background-color: #2f5d2f;
+    width: 100%;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    transform: translateY(-200%);
+    transition: 0.4s;
+  }
+
+  .menu.active{
+    transform: translateY(0);
+  }
+
+  .menu a{
+    font-size: 25px;
+    padding: 15px;
+  }
+
+  .menuh{
+    display: block;
+    font-size: 35px;
+  }
+
+     .esquerda-footer img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .direita-footer img{
+    width: 30px;
+    height: auto;
+  }
+
+  .esquerda-footer h4{
+    font-size: 20px;
+  }
+
+  .esquerda-footer{
+    width: 190px;
+    gap: 5px;
+  }
+
+  .direita-footer h4{
+    font-size: 20px;
+  }
+
+  .direita-footer{
+    gap: 15px;
+    margin: 0%;
+  }
+
+
+
+  .menuh{
+    display: flex;
+    padding-bottom: 30px;
+  }
+
+  .header{
+    justify-content: space-between;
+  }
+
+}
+
+
+
+
+   .esquerda-footer img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .direita-footer img{
+    width: 30px;
+    height: auto;
+  }
+
+  .esquerda-footer h4{
+    font-size: 20px;
+  }
+
+  .esquerda-footer{
+    width: 190px;
+    gap: 5px;
+  }
+
+  .direita-footer h4{
+    font-size: 20px;
+  }
+
+  .direita-footer{
+    gap: 15px;
+    margin: 0%;
+  }
+
+
+
+  .menuh{
+    display: flex;
+    padding-bottom: 30px;
+  }
+
+  .header{
+    justify-content: space-between;
+  }

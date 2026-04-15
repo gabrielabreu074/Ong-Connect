@@ -49,6 +49,25 @@ body{
 .menu a:hover{
   transform: scale(1.4);
 }
+
+.menuh{
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-family: "Questrial", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  display: none;
+  font-size: 55px;
+  margin-right: 40px;
+}
+
+
+
+.navh{
+  display: flex;
+}
 /*FIM HEADER*/
  
  
@@ -339,5 +358,27 @@ footer{
   font-family: "Questrial", sans-serif;
   font-size: 25px;
   font-weight: 200;
+}
+
+@media screen and (max-width:430px){
+   .menu{
+    display: none;
+  }
+
+  .menuh{ 
+    display: flex;  
+    padding-bottom: 30px; 
+    justify-content:flex-end;
+    padding-right: 10px;
+  }
+
+  .header{
+    justify-content: space-between;
+  }
+
+.logo-area img{
+  margin-left: -35px;
+}
+
 }
  
