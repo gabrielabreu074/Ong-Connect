@@ -63,6 +63,7 @@ body{
 
 
 
+
 .navh{
   display: flex;
 }
@@ -348,6 +349,9 @@ footer{
     margin-left: 25%;
   }
 
+  .serv{
+    margin-left: 25%;
+  }
   
   .esquerda-footer img {
     width: 30px;

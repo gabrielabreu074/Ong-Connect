@@ -56,14 +56,20 @@ body{
   font-style: normal;
   display: none;
   font-size: 55px;
+
   margin-right: 40px;
 }
 
+.navh{
+  display: flex;
+}
 
 
 .navh{
   display: flex;
 }
+
+
 /*FIM HEADER*/
 
 
@@ -196,7 +202,7 @@ body{
 
 }
 
-button{
+.serv{
   margin-left: 840px;
   margin-top: 60px;
   width: 220px;
@@ -211,7 +217,7 @@ button{
   transition: 0.2s;
   box-shadow: -8px 7px 10px rgba(134, 130, 130, 0.692);
 }
-button:hover{
+.serv:hover{
   transform:scale(1.2);
 }
 
@@ -265,4 +271,97 @@ footer{
 
 
 
- 
+
+@media screen and (max-width: 430px) {
+
+  main{
+    width: 100%;
+  }
+
+  .container{
+    flex-direction: column;
+    align-items: center;
+    margin-left: 0px;
+    gap: 20px;
+    width: 340px;
+    margin-left: 50px;
+  }
+  .menu{
+    display: none;
+  }
+  .logo-area img{
+    margin-left: -45px;
+  }
+  .menuh{
+    display: flex;
+  }
+  .header{
+    width: 100%;
+    justify-content: space-between;
+  }
+  .direita1, .direita2{
+    width: 90%;
+    height: auto;
+    margin-right: 33px;
+  }
+
+  .direita-footer{
+    padding: 0px;
+  }
+
+  .direita1 p, .direita2 p{
+    font-size: 18px;
+  }
+
+  .hero{
+    text-align: center;
+  }
+
+  .serv{
+    margin: 0px;
+    margin-top: 30px;
+    margin-left: 23%;
+  }
+
+  .hero h1{
+    font-size: 17px;
+  }
+  .esquerda-main img {
+    width: 00px;
+    height: auto;
+    border-radius: 15px;
+    margin-left: 5px;
+  }
+.esquerda-main{
+  width: 100%;
+}
+  .esquerda-footer img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .direita-footer img{
+    width: 30px;
+    height: auto;
+  }
+
+  .esquerda-footer h4{
+    font-size: 20px;
+  }
+
+  .esquerda-footer{
+    width: 190px;
+    gap: 5px;
+  }
+
+  .direita-footer h4{
+    font-size: 15px;
+  }
+
+  .direita-footer{
+    gap: 10px;
+    margin: 0%;
+  }
+
+  
+}
