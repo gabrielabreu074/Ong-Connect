@@ -13,6 +13,7 @@ body{
 
 /*HEADER*/
 .header{
+  display: flex;
   background-color: #2f5d2f;
   color: white;
 
@@ -46,6 +47,26 @@ body{
 .menu a:hover{
   transform: scale(1.4);
 }
+
+.menuh{
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-family: "Questrial", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  display: none;
+  font-size: 55px;
+  margin-right: 40px;
+}
+
+
+
+.navh{
+  display: flex;
+}
+
 /*FIM HEADER*/
 
 
@@ -176,7 +197,7 @@ body{
   border-radius: 15px;
 
 }
-button{
+.serv{
   margin-left: 840px;
   margin-top: 60px;
   width: 220px;
@@ -191,7 +212,7 @@ button{
   transition: 0.2s;
   box-shadow: -8px 7px 10px rgba(134, 130, 130, 0.692);
 }
-button:hover{
+.serv:hover{
   transform:scale(1.2);
 }
 /*footer*/
@@ -242,3 +263,120 @@ footer{
   font-weight: 200;
 }
 /*fim footer*/
+
+
+@media screen and (max-width: 430px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .menu{
+    display: none;
+  }
+
+  .menuh{
+    display: flex;
+    padding-bottom: 30px;
+  }
+
+  .header{
+    justify-content: space-between;
+  }
+
+.logo-area img{
+  margin-left: -35px;
+}
+
+
+  footer{
+    gap: 50px;
+  }
+
+  .hero h1{
+    font-size: 23px;
+    text-align: center;
+    animation: zoom 1.6s ease;
+  }
+
+
+
+@keyframes zoom {
+    0% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.1);
+    }
+    50% {
+        transform: scale(1);
+    }
+    75% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+  }
+
+  .esquerda-main,
+  .direita1,
+  .direita2 {
+    width: 80%;
+    height: auto;
+  }
+
+  .esquerda-main{
+    margin-right: 5%;
+  }
+
+  .direita1{
+    margin-right: 5%;
+  }
+
+  .esquerda-main img {
+    height: auto;
+    max-width: 100%;
+    border-radius: 15px;
+  }
+
+  button {
+    margin-left: 0;
+    margin-top: 30px;
+    width: 45%;
+    margin-left: 25%;
+  }
+
+  
+  .esquerda-footer img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .direita-footer img{
+    width: 30px;
+    height: auto;
+  }
+
+  .esquerda-footer h4{
+    font-size: 20px;
+  }
+
+  .esquerda-footer{
+    width: 190px;
+    gap: 5px;
+  }
+
+  .direita-footer h4{
+    font-size: 20px;
+  }
+
+  .direita-footer{
+    gap: 15px;
+    margin: 0%;
+  }
+
+  
+
+}
