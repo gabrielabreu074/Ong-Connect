@@ -6,6 +6,7 @@
 body{
   font-family: Arial, Helvetica, sans-serif;
   background-color: beige;
+  overflow-x: hidden;
 }
 
 
@@ -44,6 +45,20 @@ body{
 .menu a:hover{
   transform: scale(1.4);
 }
+
+.menuh{
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-family: "Questrial", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  display: none;
+  font-size: 55px;
+}
+
+
 /*FIM HEADER*/
 
 
@@ -91,7 +106,7 @@ body{
   padding: 20px;
 
 }
-button{
+.serv{
   margin-left: 840px;
   margin-top: 60px;
   width: 220px;
@@ -106,7 +121,7 @@ button{
   transition: 0.2s;
   box-shadow: -8px 7px 10px rgba(134, 130, 130, 0.692);
 }
-button:hover{
+.serv:hover{
   transform:scale(1.2);
 }
 /*footer*/
@@ -156,4 +171,98 @@ footer{
   font-family: "Questrial", sans-serif;
   font-size: 25px;
   font-weight: 200;
+}
+
+@media screen and (max-width: 430px) {
+  
+  
+  
+  .container{
+    flex-direction: column;
+    margin-left: 0px;
+    gap: 60px;
+    align-items: center;
+    margin-top: 50px;
+  }
+  .esquerda{
+    width: 75%;
+    height: 220px;
+  }
+  .esquerda img{
+    width: 100%;
+    height: auto;
+  }
+  .direita{
+    width: 80%;
+    height: 500px;
+
+  }
+  .direita h1{
+    font-size: 25px;
+  }
+  .direita p{
+    font-size: 19px;
+  }
+
+    .esquerda-footer img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .direita-footer img{
+    width: 30px;
+    height: auto;
+  }
+
+  .esquerda-footer h4{
+    font-size: 15px;
+  }
+
+  .esquerda-footer{
+    width: 130px;
+    gap: 5px;
+    padding-left: 2%;
+  }
+
+  .direita-footer h4{
+    font-size: 20px;
+  }
+
+  .direita-footer{
+    gap: 10px;
+    width: 130px;
+    margin: 0%;
+    padding: 0%;
+  }
+
+    footer{
+    gap: 50px;
+    margin-top: 50px;
+    width: 100%;
+    margin: 0%;
+    padding: 0%;
+  }
+  
+  .serv{
+    margin: 50px 0px 50px 25% ;
+  }
+
+    .menu{
+    display: none;
+  }
+
+  .menuh{
+    display: flex;
+  }
+
+  .navh{
+    margin: 0px;
+    width: 60px;
+  }
+
+  .header{
+    justify-content: space-between;
+    padding-left: 10px;
+  }
+
 }

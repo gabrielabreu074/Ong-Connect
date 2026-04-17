@@ -61,9 +61,7 @@ body{
 
 
 
-.navh{
-  display: flex;
-}
+
 /*FIM HEADER*/
 
 
@@ -186,9 +184,6 @@ footer{
     gap: 30px;
   }
 
-  .logo-area img{
-  margin-left: -35px;
-  }
 
   .direita{
     width: 90%;
@@ -289,19 +284,13 @@ footer{
 
   .menuh{
     display: flex;
-    padding-bottom: 30px;
   }
 
   .header{
     justify-content: space-between;
   }
 
-}
-
-
-
-
-   .esquerda-footer img {
+ .esquerda-footer img {
     width: 30px;
     height: 30px;
   }
@@ -338,4 +327,11 @@ footer{
 
   .header{
     justify-content: space-between;
+    padding-left: 10px;
   }
+}
+
+
+
+
+  

@@ -66,111 +66,10 @@ body{
 
 
 .navh{
+  width: 60px;
   display: flex;
 }
 /*FIM HEADER*/
- 
- 
-/*MAIN antigo*/
-/* .main{
-  padding:60px 80px;
-}
- 
-.conteudo{
-  display:grid;
-  grid-template-columns: 2fr 1fr;
-  gap:60px;
-}
- 
-.titulo{
-  font-size: 40px;
-  font-family: "Questrial", sans-serif;
-  font-weight: 1300;
-  font-style: normal;
-}
- 
-.card-grande{
-  background:#234f23;
-  height:500px;
-  box-shadow: -10px 7px 10px rgba(82, 78, 78, 0.692);
-  border-radius:15px;
-  margin-top: 20px;
-/*subir carde grande animação*/
-/*  opacity: 0;
-  transform: translateY(1000px);
-  animation: subirCard 0.8s ease-out forwards;
-*/
- 
- 
- 
-/*@keyframes subirCard {
-  to {
-    opacity: 1;
-    transform:  translateY(0px);
-  }
-}*/
- 
-/* .lado-direito{
-  display:flex;
-  flex-direction:column;
-  gap:30px;
-}
- 
-.card{
-  background:#234f23;
-  border-radius:15px;
-}
- 
-.pequeno1{
-  height:220px;
-  width: 70%;
-  box-shadow: -10px 7px 10px rgba(82, 78, 78, 0.692);
-    margin-top: 20px;
-}
- 
-.pequeno2{
-  height:220px;
-  width: 70%;
-  margin-top: 25px;
-  box-shadow: -10px 7px 10px rgba(82, 78, 78, 0.692);
-  margin-left: 40%;
-}
- 
-.cta{
-  margin-top: 50px;
-}
- 
-.cta h2{
-  font-size:36px;
-}
- 
-.cta button{
-  background:#f1b90b;
-  border:none;
-  padding:15px 25px;
-  border-radius:12px;
-  cursor:pointer;
-  margin-top:10px;
-  transition: 0.5s;
-  box-shadow: -10px 7px 10px rgba(82, 78, 78, 0.692);
-}
-.cta button a{
-    font-size:22px;
-    color: black;
-    text-decoration: none;
-}
- 
-.cta button:hover{
-  transform: scale(1.2);
-  background: #d8a40a;
-  box-shadow: -10px 7px 10px rgba(82, 78, 78, 0.692);
-} */
-/*FIM MAIN*/  
- 
- 
- 
- 
- 
  
 /*MAIN*/
  
@@ -186,7 +85,6 @@ h1{
   font-size: 40px;
   font-family: "Questrial", sans-serif;
   font-weight: 600;
-  white-space: pre;
 }
  
 h4{
@@ -195,7 +93,7 @@ h4{
   font-weight: lighter;
 }
  
-button{
+.serv{
   width: 300px;
   height: 60px;
   border: none;
@@ -205,12 +103,12 @@ button{
   transition: 0.3s;
   cursor: pointer;
 }
-button a{
+.serv a{
   text-decoration: none;
   color: black;
   font-family: "Questrial", sans-serif;
 }
-button:hover{
+.serv:hover{
   transform: scale(1.2);
   background-color: #d4a108;
 }
@@ -253,60 +151,9 @@ main img{
  
 /*footer*/
  
-/* footer{
-  background-color: #2f5d2f;
-  margin-top: 50px;
-  display: flex;
-  height: 100px;
-  align-items: center;
-  padding: 0px 20px;
-  color: white;
-}
+
  
-.esquerda{
-  display: flex;
-  gap: 20px;
- 
-}
- 
-.esquerda img{
-  height: 50px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.esquerda img:hover{
-  transform: scale(1.2);
-}
- 
-.esquerda h4{
-  padding-top: 10px;
-  font-weight: 200;
-  font-family: "Questrial", sans-serif;
-  font-size: 25px;
-}
- 
-.direita img{
-  height: 50px;
-  transition: 0.2s;
-  cursor: pointer;
-}
-.direita img:hover{
-  transform: scale(1.2);
-}
-.direita{
-  display: flex;
-  gap: 20px;
-  margin-left: auto;
-}
- 
-.direita h4{
-  padding: 10px;
-  font-family: "Questrial", sans-serif;
-  font-weight: 100;
-  font-size: 25px;
-} */
- 
-/*fim footer*/
+
 
 footer{
   background-color: #2f5d2f;
@@ -360,6 +207,9 @@ footer{
   font-weight: 200;
 }
 
+/*fim footer*/
+
+
 @media screen and (max-width:430px){
    .menu{
     display: none;
@@ -367,18 +217,75 @@ footer{
 
   .menuh{ 
     display: flex;  
-    padding-bottom: 30px; 
     justify-content:flex-end;
-    padding-right: 10px;
   }
 
   .header{
     justify-content: space-between;
+    padding-left: 10px;
   }
 
-.logo-area img{
-  margin-left: -35px;
-}
+  main h1{
+    width: 360px;
+    font-size: 24px;
+    text-align: center;
+    line-height: 2;
+  }
 
+  main h4{
+    font-size: 17px;
+  }
+
+  .serv{
+    width: 200px;
+    font-size: 20px;
+    height: 50px;
+  }
+
+  #imagem{
+    width: 400px;
+    height: auto;
+    border-radius: 15px;
+  }
+
+  .carrossel{
+    width: 400px;
+  }
+
+  .barra-container{
+    display: none   ;
+  }
+
+  .esquerda-footer img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .direita-footer img{
+    width: 30px;
+    height: auto;
+  }
+
+  .esquerda-footer h4{
+    font-size: 20px;
+  }
+
+  .esquerda-footer{
+    width: 190px;
+    gap: 5px;
+  }
+
+  .direita-footer h4{
+    font-size: 15px;
+  }
+
+  .direita-footer{
+    gap: 10px;
+    margin: 0%;
+  }
+
+  footer{
+    margin-top: 50px;
+  }
 }
  

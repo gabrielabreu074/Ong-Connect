@@ -48,14 +48,11 @@ body{
   font-style: normal;
   display: none;
   font-size: 55px;
-  margin-right: 40px;
 }
 
 
 
-.navh{
-  display: flex;
-}
+
 
 main h1{
   background: #2f5d2f; 
@@ -83,7 +80,7 @@ h1{
   padding-top: 75px;
   padding-left: 120px;
 }
-button{
+.botao{
   margin-top: 20px;
   width: 140px;
   height: 33px;
@@ -348,6 +345,35 @@ footer{
 
     footer{
     gap: 50px;
+  }
+
+  .menuh{
+    display: flex;
+  }
+  
+
+  .menu{
+    display: none;
+  }
+
+  header{
+    justify-content: space-between;
+    padding-left: 10px;
+  }
+
+  main h1{
+    font-size: 23px;
+    width: 90%;
+    height: 70px;
+    margin-left: 15px;
+    text-align: center;
+  }
+
+  main h3{
+    font-size: 23px;
+    width: 91%;
+    margin-left: 15px;
+    text-align: center;
   }
  }
 

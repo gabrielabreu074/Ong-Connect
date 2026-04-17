@@ -44,6 +44,20 @@ body{
 .menu a:hover{
   transform: scale(1.4);
 }
+
+.menuh{
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-family: "Questrial", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  display: none;
+  font-size: 55px;
+}
+
+
 /*FIM HEADER*/
 
 
@@ -92,7 +106,7 @@ body{
   border-radius: 15px;
 }
 
-button{
+.serv{
   margin-left: 840px;
   margin-top: 60px;
   width: 220px;
@@ -107,7 +121,7 @@ button{
   transition: 0.2s;
   box-shadow: -8px 7px 10px rgba(134, 130, 130, 0.692);
 }
-button:hover{
+.serv:hover{
   transform:scale(1.2);
 }
 
@@ -157,4 +171,95 @@ footer{
   font-family: "Questrial", sans-serif;
   font-size: 25px;
   font-weight: 200;
+}
+
+
+@media screen and (max-width: 430px) {
+  .container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-left: 0px;
+  }
+  .esquerda{
+    width: 350px;
+    height: 240px;
+  }
+
+  .direita{
+    width: 90%;
+    height: auto;
+  }
+  
+  .direita h1{
+    font-size: 25px;
+  }
+
+  .direita p{
+    font-size: 18px;
+    line-height: 22px;
+  }
+
+  .serv{
+    margin-left: 25%;
+    margin-top: 50px;
+  }
+
+  .menu{
+    display: none;
+  }
+
+  .menuh{
+    display: flex;
+  }
+
+  .navh{
+    margin: 0px;
+    width: 60px;
+  }
+
+  .header{
+    justify-content: space-between;
+    padding-left: 10px;
+  }
+
+  .esquerda-footer img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .direita-footer img{
+    width: 30px;
+    height: auto;
+  }
+
+  .esquerda-footer h4{
+    font-size: 15px;
+  }
+
+  .esquerda-footer{
+    width: 130px;
+    gap: 5px;
+    padding-left: 2%;
+  }
+
+  .direita-footer h4{
+    font-size: 20px;
+  }
+
+  .direita-footer{
+    gap: 10px;
+    width: 130px;
+    margin: 0%;
+    padding: 0%;
+  }
+
+    footer{
+    gap: 50px;
+    width: 100%;
+    margin-top: 50px;
+  }
+
+
 }

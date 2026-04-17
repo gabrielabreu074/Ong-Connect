@@ -19,7 +19,6 @@ body{
 
   display: flex;
   align-items: center;
-  padding: 0px 40px;
 
 }
 
@@ -58,14 +57,10 @@ body{
   font-style: normal;
   display: none;
   font-size: 55px;
-  margin-right: 40px;
 }
 
-
-
-
 .navh{
-  display: flex;
+  width: 60px;
 }
 
 /*FIM HEADER*/
@@ -267,6 +262,9 @@ footer{
 
 
 @media screen and (max-width: 430px) {
+  
+
+
   .container {
     flex-direction: column;
     align-items: center;
@@ -279,17 +277,12 @@ footer{
 
   .menuh{
     display: flex;
-    padding-bottom: 30px;
   }
 
   .header{
     justify-content: space-between;
+    padding-left: 10px;
   }
-
-.logo-area img{
-  margin-left: -35px;
-}
-
 
   footer{
     gap: 50px;
@@ -381,6 +374,5 @@ footer{
     margin: 0%;
   }
 
-  
 
 }
