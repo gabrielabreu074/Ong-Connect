@@ -64,10 +64,45 @@ body{
   display: flex;
 }
 
+/* menu aborgue */
 
-.navh{
+.menu-hamburguer{
+  position: fixed;
+  top: 80px;
+  right: 0;
+  z-index: 999;
+  width: 150px;
+  height: 250px;
+  background-color: #2f5d2f;
+
   display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  justify-content: center;
+  border-radius: 35px;
+
+  opacity: 0;
 }
+
+.menu-hamburguer a{
+  text-decoration: none;
+  color: white;
+  font-size: 25px;
+  font-family: "Questrial", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.menu-hamburguer a:hover{
+  transform: scale(1.2);
+  transition: ease 0.3s;
+}
+
+.menu-hamburguer.ativo{
+  opacity: 1;
+}
+
 
 
 /*FIM HEADER*/
@@ -274,6 +309,7 @@ footer{
 
 @media screen and (max-width: 430px) {
 
+  
   main{
     width: 100%;
   }
@@ -284,12 +320,19 @@ footer{
   }
 
   .container{
+    margin-top: 50px;
     flex-direction: column;
     align-items: center;
+
     margin-top:40px ;
     gap: 20px;
     width: 340px;
     margin-left: 70px;
+
+    gap: 40px;
+    width: 340px;
+    margin-left: 65px;
+
   }
   .menu{
     display: none;
@@ -299,11 +342,15 @@ footer{
     display: flex;
     margin-right: 0%;
   }
+  .navh{
+    width: 30px;
+  }
   .header{
     padding-left: 10px;
     width: 100%;
     justify-content: space-between;
   }
+
   .direita1, .direita2{
     width: 90%;
     height: auto;
@@ -324,21 +371,23 @@ footer{
 
   .serv{
     margin: 0px;
-    margin-top: 30px;
+    margin-top: 50px;
     margin-left: 23%;
   }
 
   .hero h1{
-    font-size: 17px;
+    font-size: 25px;
+    margin-top: 30px;
   }
   .esquerda-main img {
-    width: 300px;
+    width: 360px;
     height: auto;
-    border-radius: 15px;
-    margin-left: 5px;
+    margin-top: 20px;
   }
 .esquerda-main{
   width: 100%;
+  border-radius: 15px;
+  margin-right:32%;
 }
   .esquerda-footer img {
     width: 30px;
@@ -368,22 +417,26 @@ footer{
     margin: 0%;
   }
 
-  @keyframes zoom {
+  footer{
+    margin-top: 20px;
+  }
+
+  
+@keyframes zoom {
     0% {
         transform: scale(1);
     }
     25% {
-        transform: scale(1.1);
+        transform: scale(1.05);
     }
     50% {
         transform: scale(1);
     }
     75% {
-        transform: scale(1.1);
+        transform: scale(1.05);
     }
     100% {
         transform: scale(1);
     }
 }
-  
 }
