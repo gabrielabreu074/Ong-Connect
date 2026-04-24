@@ -29,11 +29,20 @@
             </button>
         </nav>
 
+        <section class="menu-mobile-container">
+            <nav class="menu-mobile" id="menuMobile">
+                <a href="index.html">Home</a>
+                <a href="ongs.html">ONGs</a>
+                <a href="ajude.html">Ajude</a>
+                <a href="admin.html">Admin</a>
+            </nav>
+        </section>
+
     </header>
     <main>
         <h1>Faça parte de alguma ONG</h1>
         <h3>Preencha o formulário abaixo para se cadastrar como voluntário.</h3>
-        <form action="" method="post" class="formulario">
+        <form id="volunteerForm" method="post" class="formulario">
         <section>
             <nav>
                 <label for="nome">Nome:</label>
@@ -52,7 +61,7 @@
 
             <nav>
                 <label for="ongs">ONGs:</label>
-                <select class="ONGs" required>
+                <select id="ongs" class="ONGs" required>
                     <option value="">Selecione uma ONG</option>
                     <option value="Casa Santa Gemma">Casa Santa Gemma</option>
                     <option value="APA">Associação Protetora de Animais (APA)</option>
@@ -75,7 +84,7 @@
         </form>
     </main>
     
-    
+        <script src="/js/ongs.js"></script>
     <script src="/js/volun.js"></script>
 </body>
 </html>

@@ -29,13 +29,15 @@
             <button class="menuh">
                 <i class="bi bi-list"></i>
             </button>
-            <section class="menu-hamburguer" id="menu-cel">
-                    <a href="index.html">Home</a>
-                    <a href="ongs.html">ONGs</a>
-                    <a href="ajude.html">Ajude</a>
-                    <a href="admin.html">Admin</a>
-            </section>
-        </nav>
+
+        <section class="menu-mobile-container">
+            <nav class="menu-mobile" id="menuMobile">
+                <a href="index.html">Home</a>
+                <a href="ongs.html">ONGs</a>
+                <a href="ajude.html">Ajude</a>
+                <a href="admin.html">Admin</a>
+            </nav>
+        </section>
 
     </header>
     <main>
@@ -82,14 +84,7 @@
             <h4>ONG Connect</h4>
         </nav>
     </footer>
-    <script>
-        const btn = document.querySelector(".menuh");
-        const menuHamburguer = document.querySelector(".menu-hamburguer");
-
-        btn.addEventListener("click", () => {
-            menuHamburguer.classList.toggle("ativo");
-        });
-    </script>
+    <script src="/js/ongs.js"></script>
 </body>
 
 </html>

@@ -1,4 +1,4 @@
-const btn = document.querySelector("button");
+const btn = document.getElementById("ajude");
 
 btn.addEventListener("click", () => {
     alert("Que bom que esteja ajudando!");

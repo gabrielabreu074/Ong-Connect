@@ -6,7 +6,6 @@
 }
 
 body{
-  font-family: Arial, Helvetica, sans-serif;
   background-color: beige;
 }
 
@@ -40,6 +39,7 @@ body{
   font-weight: 400;
   font-style: normal;
   transition: 0.3s;
+  font-family:  "Questrial", sans-serif;
 }
 
 .menu a:hover{
@@ -56,8 +56,56 @@ body{
   font-style: normal;
   display: none;
   font-size: 55px;
-  margin-top: 25px;
+  margin-top: 26px;
+  margin-left: 240px;
 }
+
+/* MENU MOBILE */
+.menu-mobile{
+  position: fixed;
+  right: -100%; /* escondido */
+  height: 100vh;
+  z-index: 12;
+  width: 30%;
+  background-color: #2f5d2fdc;
+  top: -5px;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 40px;
+  margin-top: 100px;
+  transition: 0.3s;
+  z-index: 999;
+
+}
+
+.menu-mobile.ativo{
+  right: 0; /* aparece */
+}
+
+.menu-mobile a{
+  font-size: 19px;
+  font-family: "Questrial", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+.menu-mobile a{
+  text-decoration: none;
+  color: white;
+  font-size: 25px;
+}
+
+.menu-mobile-container{
+  display: flex;
+  justify-content: flex-end;
+}
+
+.no-scroll{
+  overflow: hidden;
+}
+
 
 /*FIM HEADER*/
 
@@ -83,9 +131,10 @@ td{
   width: 2%;
   border: 1px solid #000000;
   text-align: left;
+  font-family:  "Questrial", sans-serif;
 }
 
-.editar{
+.btn-editar{
   background-color: #438143;
   padding: 5px 18px;
   border: none;
@@ -95,7 +144,7 @@ td{
   transition: 0.3s;
 }
 
-.excluir{
+.btn-excluir{
   background-color: red;
   padding: 5px 18px;
   border: none;
@@ -111,15 +160,16 @@ td{
     display: flex;
     justify-content: center;
     margin-bottom: 50px;
+    font-family:  "Questrial", sans-serif;
 
 }
 
-.editar:hover{
+.btn-editar:hover{
   transform: scale(1.2);
   background-color: #3b723b;
 }
 
-.excluir:hover{
+.btn-excluir:hover{
   transform: scale(1.2);
   background-color: rgb(197, 19, 19);
 }
@@ -159,4 +209,9 @@ td{
   .excluir{
     margin-bottom: 10px;
   }
+
+.logo-area{
+  padding-bottom:10px ;
+  padding-top: 10px;
+}
 }
