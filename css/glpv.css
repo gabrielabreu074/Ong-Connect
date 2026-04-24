@@ -56,8 +56,11 @@ body{
   font-style: normal;
   display: none;
   font-size: 55px;
-  margin-top: 30px;
-  margin-left: 250px;
+  margin-left: 244px;
+}
+
+.navh{
+  margin-top: 50px;
 }
 
 .bi.bi-list{

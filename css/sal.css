@@ -56,7 +56,9 @@ body{
   font-style: normal;
   display: none;
   font-size: 55px;
-  margin-left: 140px;
+  margin-left: 130px;
+  margin-top: 25px;
+
 }
 
 .menu-mobile{
