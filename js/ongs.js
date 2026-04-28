@@ -1,7 +1,7 @@
-const btn = document.querySelector(".menuh");
+const btnMenu = document.querySelector(".menuh");
 const menu = document.querySelector(".menu-mobile");
 
-btn.addEventListener("click", (e) => {
+btnMenu.addEventListener("click", (e) => {
   menu.classList.toggle("ativo");
   document.body.classList.toggle("no-scroll");
 
