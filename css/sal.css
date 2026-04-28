@@ -65,7 +65,6 @@ body{
   position: fixed;
   right: -100%; /* escondido */
   height: 100vh;
-  z-index: 12;
   width: 30%;
   background-color: #2f5d2fdc;
   top: -5px;
@@ -124,7 +123,7 @@ body{
   border-radius: 15px;
 }
 .esquerda img{
-  width: 666px;
+  width: 667px;
   border-radius: 15px;
 }
 .direita{
@@ -145,7 +144,6 @@ body{
   color: #d4a108;
 }
 .direita p{
-  padding: 15px;
   display: flex;
   justify-content: center;
   font-family: "Questrial", sans-serif;

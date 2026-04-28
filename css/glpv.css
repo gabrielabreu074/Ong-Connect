@@ -71,7 +71,6 @@ body{
   position: fixed;
   right: -100%; /* escondido */
   height: 100vh;
-  z-index: 12;
   width: 30%;
   background-color: #2f5d2fdc;
   top: -5px;
