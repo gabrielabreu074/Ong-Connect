@@ -168,9 +168,9 @@ def extrair_features(dados: dict) -> list[float]:
     return features
 
 
-# ─────────────────────────────────────────────────────────────
-# MODELO
-# ─────────────────────────────────────────────────────────────
+"""
+Modelo do ML(Random Forest )
+"""
 
 def treinar_modelo(registros: list[dict], rotulos: list[int]) -> dict:
     if len(registros) < 10:
@@ -282,12 +282,12 @@ def _score_heuristico_fallback(dados: dict) -> float:
 
     penalidades = 0.0
 
-    if f[8]  == 0.0: penalidades += 0.30   # telefone com tamanho errado
-    if f[9]  == 0.0: penalidades += 0.50   # DDD inválido
-    if f[10] == 1.0: penalidades += 0.45   # dígitos todos iguais
-    if f[5]  == 1.0: penalidades += 0.45   # domínio descartável
-    if f[4]  == 0.0: penalidades += 0.20   # email com formato inválido
-    if f[2]  == 0.0: penalidades += 0.20   # sem sobrenome
-    if f[3]  > 0.70: penalidades += 0.50   # nome muito parecido com lista suspeita
+    if f[8]  == 0.0: penalidades += 1.0   # telefone com tamanho errado
+    if f[9]  == 0.0: penalidades += 1.0   # DDD inválido
+    if f[10] == 1.0: penalidades += 0.50   # dígitos todos iguais
+    if f[5]  == 1.0: penalidades += 0.60   # domínio descartável
+    if f[4]  == 0.0: penalidades += 0.60   # email com formato inválido
+    if f[2]  == 0.0: penalidades += 0.40   # sem sobrenome
+    if f[3]  > 0.70: penalidades += 0.70   # nome muito parecido com lista suspeita
 
     return min(penalidades, 1.0)
