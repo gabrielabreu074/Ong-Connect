@@ -137,30 +137,30 @@ def extrair_features(dados: dict) -> list[float]:
     palavras_msg = msg.split()
 
     features = [
-        # NOME (4) — removida feature "nome_dupla" (\se\s) por ser inútil na prática
+        # Nome
         len(nome),                                                          # comprimento do nome
         1.0 if bool(re.search(r"\d", nome)) else 0.0,                      # tem número no nome?
         1.0 if " " in nome else 0.0,                                       # tem sobrenome?
         _similaridade_max(nome, NOMES_SUSPEITOS),                          # parecido com nome suspeito?
 
-        # EMAIL (4)
+        # Emails 
         1.0 if bool(re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email)) else 0.0,  # formato válido?
         1.0 if dominio in DOMINIOS_DESCARTAVEIS else 0.0,                  # domínio descartável?
         len(local),                                                         # tamanho da parte local
         1.0 if bool(re.fullmatch(r"[a-z]{1,2}\d{4,}", local)) else 0.0,  # parece gerado por bot?
 
-        # TELEFONE (4)
+        # Tel
         1.0 if len(telefone) in (10, 11) else 0.0,                        # tamanho correto?
         1.0 if ddd in DDDS_VALIDOS else 0.0,                              # DDD existe no Brasil?
         1.0 if (numero and len(set(numero)) == 1) else 0.0,               # todos dígitos iguais? (ex: 99999999)
         1.0 if numero in ("12345678", "123456789", "987654321") else 0.0,  # sequência óbvia?
 
-        # MENSAGEM (3)
+        # Mensagem da text area
         1.0 if bool(re.search(r"https?://", msg)) else 0.0,               # tem link?
         1.0 if bool(SPAM_PALAVRAS.search(msg)) else 0.0,                  # tem palavras de spam?
         (len(set(palavras_msg)) / len(palavras_msg)) if len(palavras_msg) > 3 else 1.0,  # variedade de palavras
 
-        # GERAL (2)
+        # Avalia o nome denovo
         float(len(nome.replace(" ", ""))),                                 # letras no nome (sem espaços)
         1.0 if bool(re.fullmatch(r"(.)\1+", nome.replace(" ", ""))) else 0.0,  # nome todo repetido? (ex: "aaaa")
     ]
@@ -285,7 +285,7 @@ def _score_heuristico_fallback(dados: dict) -> float:
     if f[8]  == 0.0: penalidades += 1.0   # telefone com tamanho errado
     if f[9]  == 0.0: penalidades += 1.0   # DDD inválido
     if f[10] == 1.0: penalidades += 0.50   # dígitos todos iguais
-    if f[5]  == 1.0: penalidades += 0.60   # domínio descartável
+    if f[5]  == 1.0: penalidades += 1.00   # domínio descartável
     if f[4]  == 0.0: penalidades += 0.60   # email com formato inválido
     if f[2]  == 0.0: penalidades += 0.40   # sem sobrenome
     if f[3]  > 0.70: penalidades += 0.70   # nome muito parecido com lista suspeita
