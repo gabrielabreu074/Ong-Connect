@@ -6,6 +6,7 @@ import os
 import joblib
 import numpy as np
 import unicodedata
+import random
 
 from difflib import SequenceMatcher
 from sklearn.ensemble import RandomForestClassifier
@@ -34,60 +35,9 @@ NOMES_SUSPEITOS = {
 
 # DDDs reais do Brasil segundo a ANATEL.
 DDDS_VALIDOS = {
-    # SP
-    11, 12, 13, 14, 15, 16, 17, 18, 19,
-    # RJ
-    21, 22, 24,
-    # ES
-    27, 28,
-    # MG
-    31, 32, 33, 34, 35, 37, 38,
-    # PR
-    41, 42, 43, 44, 45, 46,
-    # SC
-    47, 48, 49,
-    # RS
-    51, 53, 54, 55,
-    # DF
-    61,
-    # GO
-    62, 64,
-    # TO
-    63,
-    # MT
-    65, 66,
-    # MS
-    67,
-    # AC
-    68,
-    # RO
-    69,
-    # SE
-    79,
-    # BA
-    71, 73, 74, 75, 77,
-    # PE
-    81, 87,
-    # AL
-    82,
-    # PB
-    83,
-    # RN
-    84,
-    # CE
-    85, 88,
-    # PI
-    86, 89,
-    # PA
-    91, 93, 94,
-    # AM
-    92, 97,
-    # AP
-    96,
-    # RR
-    95,
-    # MA
-    98, 99,
+    11, 12, 13, 14, 15, 16, 17, 18, 19,21, 22, 24, 27, 28,31, 32, 33, 34, 35, 37, 38,41, 42, 43, 44, 45, 46,
+    47, 48, 49,51, 53, 54, 55, 61, 62, 64, 63, 65, 66, 67, 68, 69, 79, 71, 73, 74, 75, 77,81, 87, 82, 83, 84,
+    85, 88, 86, 89, 91, 93, 94, 92, 97, 96, 95, 98, 99,
 }
 
 SPAM_PALAVRAS = re.compile(
@@ -225,9 +175,9 @@ def prever(dados: dict) -> dict:
         score = _score_heuristico_fallback(dados)
         return {
             "score_ml":    round(score, 4),
-            "predicao":    "falso" if score >= 0.5 else "real",
-            "confianca":   round(abs(score - 0.5) * 2, 4),
-            "aprovado":    score < 0.5,
+            "predicao": "falso" if score >= 0.3 else "real",
+            "confianca": round(abs(score - 0.3) * 2, 4),
+            "aprovado": score < 0.3,
             "modelo_usado": False,
             "aviso":       "Usando fallback (modelo ainda não treinado)",
         }
@@ -238,9 +188,9 @@ def prever(dados: dict) -> dict:
 
     return {
         "score_ml":    round(prob_falso, 4),
-        "predicao":    "falso" if prob_falso >= 0.5 else "real",
-        "confianca":   round(abs(prob_falso - 0.5) * 2, 4),
-        "aprovado":    prob_falso < 0.5,
+        "predicao":    "falso" if prob_falso >= 0.3 else "real",
+        "confianca":   round(abs(prob_falso - 0.3) * 2, 4),
+        "aprovado":    prob_falso < 0.3,
         "modelo_usado": True,
     }
 
@@ -272,10 +222,6 @@ def importancia_features() -> dict:
     }
 
 
-"""
-Fallback Heurístico, vai ser usado quando o modelo de ML ainda não foi treinado, como por exemplo acabamos de instalar o sistema e não temos 
-exemplos rotulados suficientes para treinar o Random Forest.
-""" 
 
 def _score_heuristico_fallback(dados: dict) -> float:
     f = extrair_features(dados)
@@ -291,3 +237,146 @@ def _score_heuristico_fallback(dados: dict) -> float:
     if f[3]  > 0.70: penalidades += 0.70   # nome muito parecido com lista suspeita
 
     return min(penalidades, 1.0)
+
+
+def gerar_dados_sinteticos() -> tuple[list[dict], list[int]]:
+    """
+        Gera exemplos de dados reais e falsos para pré-treinar o 
+        modelo de ML sem precisar de dados reais.
+    """
+
+    nomes_reais = [
+        "Ana Paula Ferreira", "Carlos Eduardo Souza", "Mariana Lima Costa",
+        "Roberto Alves Pereira", "Fernanda Oliveira Santos", "Lucas Mendes Rodrigues",
+        "Juliana Nascimento Silva", "Paulo Henrique Carvalho", "Beatriz Rocha Martins",
+        "Gabriel Araujo Ribeiro", "Camila Dias Goncalves", "Diego Vieira Barbosa",
+        "Larissa Cunha Monteiro", "Rafael Teixeira Cardoso", "Priscila Moura Freitas",
+        "Thiago Lopes Cavalcanti", "Amanda Pinto Correia", "Bruno Azevedo Moreira",
+        "Vanessa Campos Nunes", "Rodrigo Farias Melo",
+    ]
+
+    nomes_falsos = [
+        "teste", "Teste Teste", "asdf qwer", "fulano de tal", "aaaaaa bbbbbb",
+        "user123", "admin admin", "fake user", "joao silva", "maria silva",
+        "Jose Silva", "nome sobrenome", "aaaa bbbb", "xpto xpto", "null null",
+        "zzzzzz", "123456 789", "anon anonimo", "ninguem nenhum", "tt tt",
+    ]
+
+    emails_reais = [
+        "ana.ferreira@gmail.com", "carlos.souza@hotmail.com", "mariana.costa@yahoo.com",
+        "roberto.pereira@outlook.com", "fernanda.santos@gmail.com", "lucas.rodrigues@hotmail.com",
+        "juliana.silva@yahoo.com", "paulo.carvalho@gmail.com", "beatriz.martins@outlook.com",
+        "gabriel.ribeiro@gmail.com", "camila.goncalves@hotmail.com", "diego.barbosa@gmail.com",
+        "larissa.monteiro@yahoo.com", "rafael.cardoso@outlook.com", "priscila.freitas@gmail.com",
+        "thiago.cavalcanti@hotmail.com", "amanda.correia@gmail.com", "bruno.moreira@yahoo.com",
+        "vanessa.nunes@outlook.com", "rodrigo.melo@gmail.com",
+    ]
+
+    emails_falsos = [
+        "test@mailinator.com", "fake@guerrillamail.com", "spam@yopmail.com",
+        "a1234@trashmail.com", "b9876@tempmail.com", "x123@throwam.com",
+        "asdf@fakeinbox.com", "zz@10minutemail.com", "aa@spambog.com",
+        "temp@getnada.com", "bot@discard.email", "trash@maildrop.cc",
+        "x@x.com", "a@b.c", "123@456.com",
+        "noreply@fake.net", "void@null.com", "noone@nowhere.org",
+        "q1w2e3@trashmail.io", "abc123@sharklasers.com", "dgagfaugfia172@gmail.com", "naoexisto29783@gmai.com",
+        "falsotest@outlook.com", "spamspamspam129875@hotmail.com", "aposteaqui@gmail.com", "xkqwzmn88@gmail.com",
+        "bvrtplxk91@hotmail.com", "wqzxmnbv44@outlook.com", "kplxqwrtz77@yahoo.com", "zxcvbnmqw33@gmail.com", 
+        "dghjklmnpq@gmail.com", "bcdfghjklm@hotmail.com", "qwrtpsdfgh@outlook.com", "zxcvbnmpqr@yahoo.com", "mnbvcxzlkj@gmail.com",
+        "1234567890@gmail.com", "9988776655@hotmail.com","1122334455@outlook.com", "0987654321@yahoo.com", "1111222233@gmail.com",
+        "brunosantos19283@gmail.com", "fernandaoliveira28374@hotmail.com", "thiagoribeiro91827@outlook.com", "camilaferreira37261@yahoo.com", 
+        "rodrigomartins46372@gmail.com", "maria29837461@gmail.com", "joao88712634@hotmail.com", "pedro11029374@outlook.com",
+        "ana99182736@yahoo.com", "lucas77261534@gmail.com", "abcdefghijklmnopqrstu@gmail.com","aaabbbcccdddeeefffggg@hotmail.com",
+        "xyzxyzxyzxyzxyzxyz99@outlook.com", "testetetestetestetest@yahoo.com", "randomrandomrandomrr1@gmail.com",
+
+    ]
+
+    telefones_reais = [
+        "11987654321", "21976543210", "31965432109", "41954321098", "51943210987",
+        "61932109876", "71921098765", "81910987654", "91909876543", "11876543210",
+        "21865432109", "31854321098", "41843210987", "51832109876", "61821098765",
+        "71810987654", "81809876543", "91898765432", "11987123456", "21976234567",
+    ]
+
+    telefones_falsos = [
+
+    "11900000000", "11911111111", "11922222222", "11933333333", "11944444444", "21901234567", "21912345678", "21923456789",
+    "21934567890", "21987654321", "31912121212", "31923232323", "31934343434", "31945454545", "31956565656", "41900011122",
+    "41911122233", "41922233344", "41933344455", "41910203040", "51911111112", "51922222223", "51933333334", "51944444445",
+    "51901010101", "61900000001", "61910000000", "61900000100", "61900010001", "61911001100", "71900000000", "71911111111",
+    "71999999990", "71988888881", "71977777772", "81912345678", "81998765432", "81911223344", "81900102030", "81955443322",
+    "85912340000", "85900001234", "85911110000", "85900000123", "85912121212", "92900000000", "92911111110", "92922222221", 
+    "92933333332", "92999999998",
+
+    "98912345678", "62911111111", "67900000000", "68912121212", "96901234567", "95911223344", "94912345678", "93900000001", 
+    "69901010101", "63911111112", "1133334444", "2122223333", "3133334444", "4133334444", "5133334444", "98912345678", 
+    "62911111111", "67900000000", "68912121212", "96901234567", "95911223344", "94912345678", "93900000001", "69901010101",
+    "63911111112", "1133334444", "2122223333", "3133334444", "4133334444", "5133334444",
+    ]
+
+    mensagens_reais = [
+        "Quero ajudar crianças carentes da minha cidade.",
+        "Tenho experiência com trabalho voluntário em abrigos.",
+        "Gostaria de contribuir com meu tempo livre aos fins de semana.",
+        "Sou estudante de pedagogia e quero ajudar em projetos educacionais.",
+        "Tenho disponibilidade nas tardes e quero fazer a diferença.",
+        "Já fui voluntário em outras ONGs e quero continuar.",
+        "Me interesso por causas ambientais e gostaria de participar.",
+        "Quero ajudar idosos e tenho experiência como cuidador.",
+        "Sou formada em nutrição e posso colaborar com projetos alimentares.",
+        "Tenho carro e posso ajudar com transporte de doações.",
+        "", "", "", "", "",
+    ]
+
+    mensagens_falsas = [
+        "Compre agora! Acesse http://spam.com e ganhe dinheiro!",
+        "Renda extra garantida! Bitcoin e cripto investimento seguro.",
+        "Clique aqui para ganhar dinheiro fácil! http://fraude.net",
+        "Venda produtos e ganhe comissão. Acesse já!",
+        "Promoção imperdível! Invista em cripto agora.",
+        "http://malware.com clique aqui urgente!!!",
+        "ganhar dinheiro facil sem sair de casa investimento bitcoin",
+        "venda venda venda produto promoção acesse já",
+        "https://phishing.com/login confirme seus dados agora",
+        "renda extra todos os dias bitcoin cripto investimento",
+    ]
+
+    registros, rotulos = [], []
+
+    for _ in range(60):
+        registros.append({
+            "nome":      random.choice(nomes_reais),
+            "email":     random.choice(emails_reais),
+            "telefone":  random.choice(telefones_reais),
+            "mensagem":  random.choice(mensagens_reais),
+        })
+        rotulos.append(0)  # real
+
+    for _ in range(60):
+        registros.append({
+            "nome":      random.choice(nomes_falsos),
+            "email":     random.choice(emails_falsos),
+            "telefone":  random.choice(telefones_falsos),
+            "mensagem":  random.choice(mensagens_falsas),
+        })
+        rotulos.append(1)  # falso
+
+    return registros, rotulos
+
+
+def inicializar_modelo():
+    """
+    Se o modelo do ML ainda não existir, será treinado com os dados mencionados acima.
+    """
+    if not os.path.exists(MODEL_PATH):
+        print("[ML] Modelo não encontrado. Treinando com dados sintéticos...")
+        registros, rotulos = gerar_dados_sinteticos()
+        resultado = treinar_modelo(registros, rotulos)
+        print(f"[ML] {resultado.get('mensagem', resultado.get('erro'))}")
+    else:
+        print("[ML] Modelo carregado com sucesso.")
+
+# Vai chamar a função quando o arquivo for importado.
+inicializar_modelo()
+
+print(importancia_features())

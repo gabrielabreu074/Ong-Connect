@@ -1,9 +1,8 @@
 from flask import Flask, request, jsonify, send_from_directory
 import sqlite3
 import os
-import json
 
-from ml_detector import prever, treinar_modelo, importancia_features, extrair_features
+from ml_detector import prever, importancia_features
 
 app = Flask(__name__, static_folder='public', static_url_path='')
 
@@ -30,20 +29,9 @@ def init_db():
                 mensagem        TEXT,
                 score_ml        REAL    DEFAULT NULL,
                 predicao_ml     TEXT    DEFAULT NULL,
-                rotulo_manual   INTEGER DEFAULT NULL,
                 modelo_usado    INTEGER DEFAULT 0
             )
         ''')
-        for col, tipo, default in [
-            ("score_ml",      "REAL",    "NULL"),
-            ("predicao_ml",   "TEXT",    "NULL"),
-            ("rotulo_manual", "INTEGER", "NULL"),
-            ("modelo_usado",  "INTEGER", "0"),
-        ]:
-            try:
-                conn.execute(f"ALTER TABLE voluntarios ADD COLUMN {col} {tipo} DEFAULT {default}")
-            except Exception:
-                pass
         conn.commit()
 
 
@@ -161,64 +149,6 @@ def excluir_voluntario(id):
 
 # ── Rotas de Machine Learning ─────────────────────────────────────────────────
 
-@app.route('/api/ml/rotular/<int:id>', methods=['POST'])
-def rotular_voluntario(id):
-    """Admin marca voluntário como real (0) ou falso (1) para treinar o modelo."""
-    dados  = request.get_json()
-    rotulo = dados.get('rotulo')
-
-    if rotulo not in (0, 1):
-        return jsonify({'erro': 'Rótulo inválido. Use 0 (real) ou 1 (falso).'}), 400
-
-    conn = get_db()
-    if not conn.execute('SELECT id FROM voluntarios WHERE id = ?', (id,)).fetchone():
-        conn.close()
-        return jsonify({'erro': 'Voluntário não encontrado.'}), 404
-
-    conn.execute('UPDATE voluntarios SET rotulo_manual = ? WHERE id = ?', (rotulo, id))
-    conn.commit()
-
-    total_rotulados = conn.execute(
-        'SELECT COUNT(*) FROM voluntarios WHERE rotulo_manual IS NOT NULL'
-    ).fetchone()[0]
-    conn.close()
-
-    return jsonify({
-        'mensagem'       : f'Voluntário #{id} rotulado como {"falso" if rotulo else "real"}.',
-        'total_rotulados': total_rotulados,
-        'dica'           : 'Chame /api/ml/treinar quando tiver pelo menos 4 exemplos rotulados.',
-    })
-
-
-@app.route('/api/ml/treinar', methods=['POST'])
-def treinar():
-    """Treina o modelo com os rótulos manuais + predições anteriores como bootstrap."""
-    conn = get_db()
-    rows = conn.execute('SELECT * FROM voluntarios').fetchall()
-    conn.close()
-
-    registros, rotulos = [], []
-
-    for row in rows:
-        r = dict(row)
-        if r.get('rotulo_manual') is not None:
-            registros.append(r)
-            rotulos.append(int(r['rotulo_manual']))
-        elif r.get('predicao_ml') is not None:
-            registros.append(r)
-            rotulos.append(1 if r['predicao_ml'] == 'falso' else 0)
-
-    if len(registros) < 4:
-        return jsonify({
-            'erro' : 'Dados insuficientes. Mínimo de 4 exemplos.',
-            'dica' : 'Rotule voluntários via POST /api/ml/rotular/<id>.',
-            'total': len(registros),
-        }), 400
-
-    resultado = treinar_modelo(registros, rotulos)
-    return jsonify(resultado)
-
-
 @app.route('/api/ml/prever', methods=['POST'])
 def prever_externo():
     """Testa o modelo com dados avulsos sem salvar no banco."""
@@ -239,24 +169,21 @@ def status_ml():
     """Resumo do estado atual do modelo."""
     from ml_detector import MODEL_PATH
 
-    conn          = get_db()
-    total         = conn.execute("SELECT COUNT(*) FROM voluntarios").fetchone()[0]
-    rotulados     = conn.execute("SELECT COUNT(*) FROM voluntarios WHERE rotulo_manual IS NOT NULL").fetchone()[0]
-    falsos_pred   = conn.execute("SELECT COUNT(*) FROM voluntarios WHERE predicao_ml='falso'").fetchone()[0]
-    reais_pred    = conn.execute("SELECT COUNT(*) FROM voluntarios WHERE predicao_ml='real'").fetchone()[0]
+    conn        = get_db()
+    total       = conn.execute("SELECT COUNT(*) FROM voluntarios").fetchone()[0]
+    falsos_pred = conn.execute("SELECT COUNT(*) FROM voluntarios WHERE predicao_ml='falso'").fetchone()[0]
+    reais_pred  = conn.execute("SELECT COUNT(*) FROM voluntarios WHERE predicao_ml='real'").fetchone()[0]
     conn.close()
 
-    modelo_existe  = os.path.exists(MODEL_PATH)
-    modelo_kb      = round(os.path.getsize(MODEL_PATH) / 1024, 1) if modelo_existe else 0
+    modelo_existe = os.path.exists(MODEL_PATH)
+    modelo_kb     = round(os.path.getsize(MODEL_PATH) / 1024, 1) if modelo_existe else 0
 
     return jsonify({
-        'modelo_treinado'   : modelo_existe,
-        'modelo_tamanho_kb' : modelo_kb,
-        'total_voluntarios' : total,
-        'rotulados_manual'  : rotulados,
-        'preditos_falsos'   : falsos_pred,
-        'preditos_reais'    : reais_pred,
-        'pronto_para_treino': rotulados >= 4,
+        'modelo_treinado'  : modelo_existe,
+        'modelo_tamanho_kb': modelo_kb,
+        'total_voluntarios': total,
+        'preditos_falsos'  : falsos_pred,
+        'preditos_reais'   : reais_pred,
     })
 
 
