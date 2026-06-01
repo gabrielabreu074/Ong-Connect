@@ -1,6 +1,8 @@
 """
 Detector de voluntários falsos usando Random Forest.
+Integrado ao sistema de cadastro de ONGs.
 """
+
 import re
 import os
 import joblib
@@ -12,11 +14,11 @@ from difflib import SequenceMatcher
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
 
-# ─── Caminho do modelo ───────────────────────────────────────────────
+# ─── Caminho do modelo ────────────────────────────────────────────────────────
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "modelo_voluntarios.pkl")
 
-# Lista de emails 
+# ─── Listas de referência ─────────────────────────────────────────────────────
 DOMINIOS_DESCARTAVEIS = {
     "mailinator.com", "guerrillamail.com", "trashmail.com", "yopmail.com",
     "tempmail.com", "throwam.com", "sharklasers.com", "grr.la", "spam4.me",
@@ -33,11 +35,19 @@ NOMES_SUSPEITOS = {
     "anonimo", "anonymous", "fake", "falso", "ninguem", "none", "null",
 }
 
-# DDDs reais do Brasil segundo a ANATEL.
+# ONGs com nomes claramente falsos/teste
+ONGS_SUSPEITAS = {
+    "teste", "test", "ong teste", "nenhuma", "none", "null", "fake",
+    "qualquer", "asdf", "qwerty", "ong fake", "admin", "n/a", "na",
+}
+
+# DDDs válidos no Brasil (ANATEL)
 DDDS_VALIDOS = {
-    11, 12, 13, 14, 15, 16, 17, 18, 19,21, 22, 24, 27, 28,31, 32, 33, 34, 35, 37, 38,41, 42, 43, 44, 45, 46,
-    47, 48, 49,51, 53, 54, 55, 61, 62, 64, 63, 65, 66, 67, 68, 69, 79, 71, 73, 74, 75, 77,81, 87, 82, 83, 84,
-    85, 88, 86, 89, 91, 93, 94, 92, 97, 96, 95, 98, 99,
+    11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 24, 27, 28,
+    31, 32, 33, 34, 35, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+    51, 53, 54, 55, 61, 62, 63, 64, 65, 66, 67, 68, 69,
+    71, 73, 74, 75, 77, 79, 81, 82, 83, 84, 85, 86, 87, 88, 89,
+    91, 92, 93, 94, 95, 96, 97, 98, 99,
 }
 
 SPAM_PALAVRAS = re.compile(
@@ -47,12 +57,10 @@ SPAM_PALAVRAS = re.compile(
 )
 
 
-"""
-Converte todos os caracteres Maiúsculos em Minúsculos, tira os acentos e remove espaços na borda
-
-"""
+# ─── Utilitários ──────────────────────────────────────────────────────────────
 
 def _normalizar(texto: str) -> str:
+    """Minúsculas, sem acento, sem espaços nas bordas."""
     nfkd = unicodedata.normalize("NFKD", texto)
     return "".join(c for c in nfkd if not unicodedata.combining(c)).lower().strip()
 
@@ -62,70 +70,80 @@ def _so_digitos(texto: str) -> str:
 
 
 def _similaridade_max(texto: str, lista: set) -> float:
-    return max((SequenceMatcher(None, texto, s).ratio() for s in lista), default=0.0)
+    return max(
+        (SequenceMatcher(None, texto, s).ratio() for s in lista),
+        default=0.0,
+    )
 
 
-"""
-Transforma todos os caracteres em números, já que o ML só entende números.
-"""
+# ─── Extração de features ─────────────────────────────────────────────────────
 
 def extrair_features(dados: dict) -> list[float]:
+    """
+    Transforma os campos do formulário em 21 features numéricas para o modelo.
+    Campos esperados: nome, email, telefone, ong, mensagem
+    """
     nome     = _normalizar(dados.get("nome", ""))
     email    = dados.get("email", "").lower().strip()
     telefone = _so_digitos(dados.get("telefone", ""))
+    ong      = _normalizar(dados.get("ong", ""))
     msg      = dados.get("mensagem", "").lower()
 
-    # Remove DDI do Brasil se vier junto
+    # Remove DDI do Brasil se vier junto (+55 ou 55)
     if telefone.startswith("55") and len(telefone) in (12, 13):
         telefone = telefone[2:]
 
-    dominio = email.split("@")[1] if "@" in email else ""
-    local   = email.split("@")[0] if "@" in email else email
-
-    ddd    = int(telefone[:2]) if len(telefone) >= 2 else 0
-    numero = telefone[2:] if len(telefone) >= 4 else ""
+    dominio      = email.split("@")[1] if "@" in email else ""
+    local        = email.split("@")[0] if "@" in email else email
+    ddd          = int(telefone[:2]) if len(telefone) >= 2 else 0
+    numero       = telefone[2:] if len(telefone) >= 4 else ""
     palavras_msg = msg.split()
 
     features = [
-        # Nome
-        len(nome),                                                          # comprimento do nome
-        1.0 if bool(re.search(r"\d", nome)) else 0.0,                      # tem número no nome?
-        1.0 if " " in nome else 0.0,                                       # tem sobrenome?
-        _similaridade_max(nome, NOMES_SUSPEITOS),                          # parecido com nome suspeito?
+        # ── Nome ──────────────────────────────────────────────────────────────
+        float(len(nome)),                                                        # 0  comprimento do nome
+        1.0 if bool(re.search(r"\d", nome)) else 0.0,                           # 1  tem número no nome?
+        1.0 if " " in nome else 0.0,                                             # 2  tem sobrenome?
+        _similaridade_max(nome, NOMES_SUSPEITOS),                                # 3  parecido com nome suspeito?
 
-        # Emails 
-        1.0 if bool(re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email)) else 0.0,  # formato válido?
-        1.0 if dominio in DOMINIOS_DESCARTAVEIS else 0.0,                  # domínio descartável?
-        len(local),                                                         # tamanho da parte local
-        1.0 if bool(re.fullmatch(r"[a-z]{1,2}\d{4,}", local)) else 0.0,  # parece gerado por bot?
+        # ── E-mail ────────────────────────────────────────────────────────────
+        1.0 if bool(re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email)) else 0.0, # 4  formato válido?
+        1.0 if dominio in DOMINIOS_DESCARTAVEIS else 0.0,                        # 5  domínio descartável?
+        float(len(local)),                                                       # 6  tamanho da parte local
+        1.0 if bool(re.fullmatch(r"[a-z]{1,2}\d{4,}", local)) else 0.0,         # 7  parece gerado por bot?
 
-        # Tel
-        1.0 if len(telefone) in (10, 11) else 0.0,                        # tamanho correto?
-        1.0 if ddd in DDDS_VALIDOS else 0.0,                              # DDD existe no Brasil?
-        1.0 if (numero and len(set(numero)) == 1) else 0.0,               # todos dígitos iguais? (ex: 99999999)
-        1.0 if numero in ("12345678", "123456789", "987654321") else 0.0,  # sequência óbvia?
+        # ── Telefone ──────────────────────────────────────────────────────────
+        1.0 if len(telefone) in (10, 11) else 0.0,                              # 8  tamanho correto?
+        1.0 if ddd in DDDS_VALIDOS else 0.0,                                    # 9  DDD existe no Brasil?
+        1.0 if (numero and len(set(numero)) == 1) else 0.0,                     # 10 todos dígitos iguais?
+        1.0 if numero in ("12345678", "123456789", "987654321") else 0.0,        # 11 sequência óbvia?
 
-        # Mensagem da text area
-        1.0 if bool(re.search(r"https?://", msg)) else 0.0,               # tem link?
-        1.0 if bool(SPAM_PALAVRAS.search(msg)) else 0.0,                  # tem palavras de spam?
-        (len(set(palavras_msg)) / len(palavras_msg)) if len(palavras_msg) > 3 else 1.0,  # variedade de palavras
+        # ── Mensagem ──────────────────────────────────────────────────────────
+        1.0 if bool(re.search(r"https?://", msg)) else 0.0,                     # 12 tem link?
+        1.0 if bool(SPAM_PALAVRAS.search(msg)) else 0.0,                        # 13 tem palavras de spam?
+        (len(set(palavras_msg)) / len(palavras_msg))
+            if len(palavras_msg) > 3 else 1.0,                                  # 14 variedade de palavras
 
-        # Avalia o nome denovo
-        float(len(nome.replace(" ", ""))),                                 # letras no nome (sem espaços)
-        1.0 if bool(re.fullmatch(r"(.)\1+", nome.replace(" ", ""))) else 0.0,  # nome todo repetido? (ex: "aaaa")
+        # ── Nome (complementar) ───────────────────────────────────────────────
+        float(len(nome.replace(" ", ""))),                                      # 15 letras no nome (sem espaços)
+        1.0 if bool(re.fullmatch(r"(.)\1+", nome.replace(" ", ""))) else 0.0,   # 16 nome todo repetido?
+
+        # ── ONG ───────────────────────────────────────────────────────────────
+        float(len(ong)),                                                         # 17 comprimento do nome da ONG
+        1.0 if " " in ong else 0.0,                                              # 18 ONG tem mais de uma palavra?
+        _similaridade_max(ong, ONGS_SUSPEITAS),                                  # 19 ONG parecida com nome suspeito?
+        1.0 if bool(re.search(r"\d{3,}", ong)) else 0.0,                        # 20 ONG com sequência de números?
     ]
 
     return features
 
 
-"""
-Modelo do ML(Random Forest )
-"""
+# ─── Treinamento ──────────────────────────────────────────────────────────────
 
 def treinar_modelo(registros: list[dict], rotulos: list[int]) -> dict:
     if len(registros) < 10:
         return {
-            "erro": "São necessários pelo menos 10 exemplos para treinar o modelo.",
+            "erro": "São necessários pelo menos 10 exemplos para treinar.",
             "total": len(registros),
         }
 
@@ -144,9 +162,8 @@ def treinar_modelo(registros: list[dict], rotulos: list[int]) -> dict:
     )
 
     acuracia_cv = None
-    # Cross-validation só vale a pena com dados suficientes
     if len(registros) >= 50:
-        k = min(5, len(registros) // 10)
+        k      = min(5, len(registros) // 10)
         scores = cross_val_score(modelo, X, y, cv=k, scoring="f1_weighted")
         acuracia_cv = float(round(scores.mean(), 4))
 
@@ -154,12 +171,14 @@ def treinar_modelo(registros: list[dict], rotulos: list[int]) -> dict:
     joblib.dump(modelo, MODEL_PATH)
 
     return {
-        "mensagem": "Modelo treinado com sucesso!",
-        "total_exemplos": len(registros),
-        "acuracia_cv": acuracia_cv,
-        "modelo_salvo": MODEL_PATH,
+        "mensagem"       : "Modelo treinado com sucesso!",
+        "total_exemplos" : len(registros),
+        "acuracia_cv"    : acuracia_cv,
+        "modelo_salvo"   : MODEL_PATH,
     }
 
+
+# ─── Predição ─────────────────────────────────────────────────────────────────
 
 def carregar_modelo():
     if os.path.exists(MODEL_PATH):
@@ -167,38 +186,90 @@ def carregar_modelo():
     return None
 
 
+THRESHOLD = 0.5  # Score acima disso = bloqueado como falso
+
+
+def _diagnostico(dados: dict, features: list) -> list[str]:
+    """Retorna lista de motivos legíveis pelo qual o cadastro foi suspeito."""
+    motivos = []
+
+    if features[3] > 0.70:
+        motivos.append("Nome muito parecido com nomes suspeitos (ex: 'teste', 'fulano')")
+    if features[1] == 1.0:
+        motivos.append("Nome contém números")
+    if features[16] == 1.0:
+        motivos.append("Nome formado por letras repetidas (ex: 'aaaa')")
+    if features[2] == 0.0:
+        motivos.append("Nome sem sobrenome")
+    if features[4] == 0.0:
+        motivos.append("E-mail com formato inválido")
+    if features[5] == 1.0:
+        motivos.append("E-mail usa domínio descartável (ex: mailinator, yopmail)")
+    if features[7] == 1.0:
+        motivos.append("E-mail parece gerado automaticamente por bot")
+    if features[8] == 0.0:
+        motivos.append(f"Telefone com tamanho incorreto (esperado 10 ou 11 dígitos, recebido: '{_so_digitos(dados.get('telefone',''))}')")
+    if features[9] == 0.0:
+        tel = _so_digitos(dados.get("telefone", ""))
+        ddd = tel[:2] if len(tel) >= 2 else "??"
+        motivos.append(f"DDD '{ddd}' não existe no Brasil")
+    if features[10] == 1.0:
+        motivos.append("Telefone com todos os dígitos iguais (ex: 99999-9999)")
+    if features[11] == 1.0:
+        motivos.append("Telefone com sequência óbvia (ex: 12345-6789)")
+    if features[12] == 1.0:
+        motivos.append("Mensagem contém link (URL)")
+    if features[13] == 1.0:
+        motivos.append("Mensagem contém palavras de spam (bitcoin, venda, renda extra...)")
+    if features[19] > 0.70:
+        motivos.append("Nome da ONG parece falso ou genérico")
+
+    return motivos
+
+
 def prever(dados: dict) -> dict:
+    """
+    Recebe um dict com nome, email, telefone, ong, mensagem.
+    Retorna score_ml, predicao, confianca, aprovado, modelo_usado, motivos.
+    """
     modelo   = carregar_modelo()
-    features = np.array([extrair_features(dados)])
+    features = extrair_features(dados)
+    features_arr = np.array([features])
 
     if modelo is None:
-        score = _score_heuristico_fallback(dados)
+        score  = _score_heuristico_fallback(dados)
+        falso  = score >= THRESHOLD
         return {
-            "score_ml":    round(score, 4),
-            "predicao": "falso" if score >= 0.3 else "real",
-            "confianca": round(abs(score - 0.3) * 2, 4),
-            "aprovado": score < 0.3,
+            "score_ml"    : round(score, 4),
+            "predicao"    : "falso" if falso else "real",
+            "confianca"   : round(abs(score - THRESHOLD) * 2, 4),
+            "aprovado"    : not falso,
             "modelo_usado": False,
-            "aviso":       "Usando fallback (modelo ainda não treinado)",
+            "motivos"     : _diagnostico(dados, features) if falso else [],
+            "aviso"       : "Usando fallback heurístico (modelo ainda não treinado)",
         }
 
-    proba     = modelo.predict_proba(features)[0]
-    idx_falso = list(modelo.classes_).index(1)
+    proba      = modelo.predict_proba(features_arr)[0]
+    idx_falso  = list(modelo.classes_).index(1)
     prob_falso = float(proba[idx_falso])
+    falso      = prob_falso >= THRESHOLD
 
     return {
-        "score_ml":    round(prob_falso, 4),
-        "predicao":    "falso" if prob_falso >= 0.3 else "real",
-        "confianca":   round(abs(prob_falso - 0.3) * 2, 4),
-        "aprovado":    prob_falso < 0.3,
+        "score_ml"    : round(prob_falso, 4),
+        "predicao"    : "falso" if falso else "real",
+        "confianca"   : round(abs(prob_falso - THRESHOLD) * 2, 4),
+        "aprovado"    : not falso,
         "modelo_usado": True,
+        "motivos"     : _diagnostico(dados, features) if falso else [],
     }
 
+
+# ─── Importância das features ─────────────────────────────────────────────────
 
 def importancia_features() -> dict:
     modelo = carregar_modelo()
     if modelo is None:
-        return {"erro": "Modelo não treinado"}
+        return {"erro": "Modelo não treinado ainda."}
 
     nomes = [
         "nome_len", "nome_numero", "nome_sobrenome", "nome_similaridade",
@@ -206,6 +277,7 @@ def importancia_features() -> dict:
         "tel_ok", "tel_ddd", "tel_repetido", "tel_sequencial",
         "msg_url", "msg_spam", "msg_diversidade",
         "nome_letras", "nome_repetido",
+        "ong_len", "ong_palavras", "ong_similaridade", "ong_numeros",
     ]
 
     ranking = sorted(
@@ -222,27 +294,34 @@ def importancia_features() -> dict:
     }
 
 
+# ─── Fallback heurístico ──────────────────────────────────────────────────────
 
 def _score_heuristico_fallback(dados: dict) -> float:
     f = extrair_features(dados)
 
     penalidades = 0.0
+    if f[8]  == 0.0: penalidades += 1.00  # telefone com tamanho errado
+    if f[9]  == 0.0: penalidades += 1.00  # DDD inválido
+    if f[10] == 1.0: penalidades += 0.50  # dígitos todos iguais
+    if f[5]  == 1.0: penalidades += 1.00  # domínio descartável
+    if f[4]  == 0.0: penalidades += 0.60  # email com formato inválido
+    if f[2]  == 0.0: penalidades += 0.40  # sem sobrenome
+    if f[3]  > 0.70: penalidades += 0.70  # nome muito parecido com lista suspeita
+    if f[19] > 0.70: penalidades += 0.50  # ONG suspeita
+    if f[17] < 3.0 : penalidades += 0.30  # nome de ONG muito curto
 
-    if f[8]  == 0.0: penalidades += 1.0   # telefone com tamanho errado
-    if f[9]  == 0.0: penalidades += 1.0   # DDD inválido
-    if f[10] == 1.0: penalidades += 0.50   # dígitos todos iguais
-    if f[5]  == 1.0: penalidades += 1.00   # domínio descartável
-    if f[4]  == 0.0: penalidades += 0.60   # email com formato inválido
-    if f[2]  == 0.0: penalidades += 0.40   # sem sobrenome
-    if f[3]  > 0.70: penalidades += 0.70   # nome muito parecido com lista suspeita
+    return min(penalidades / 4.0, 1.0)
 
-    return min(penalidades, 1.0)
 
+
+
+
+# ─── Dados sintéticos para pré-treino ─────────────────────────────────────────
 
 def gerar_dados_sinteticos() -> tuple[list[dict], list[int]]:
     """
-        Gera exemplos de dados reais e falsos para pré-treinar o 
-        modelo de ML sem precisar de dados reais.
+    Gera exemplos balanceados de cadastros reais e falsos
+    para pré-treinar o modelo sem precisar de dados reais.
     """
 
     nomes_reais = [
@@ -259,17 +338,22 @@ def gerar_dados_sinteticos() -> tuple[list[dict], list[int]]:
         "teste", "Teste Teste", "asdf qwer", "fulano de tal", "aaaaaa bbbbbb",
         "user123", "admin admin", "fake user", "joao silva", "maria silva",
         "Jose Silva", "nome sobrenome", "aaaa bbbb", "xpto xpto", "null null",
-        "zzzzzz", "123456 789", "anon anonimo", "ninguem nenhum", "tt tt",
+        "zzzzzz", "123456 789", "anon anonimo", "ninguem nenhum", "tt tt", "djfsdf dffsdfs",
+        "sdfsdj ueeom", "qwerty asdfgh", "abc abc", "test test", "fake fake", "saaasaaa fwefv", 
+        "efjsndfksdfsdf sdfsd", "asdf asdf", "qwer qwer", "zxcv zxcv", "aaaaaa aaaaaa", "bbbbbb bbbbbb",
     ]
 
     emails_reais = [
         "ana.ferreira@gmail.com", "carlos.souza@hotmail.com", "mariana.costa@yahoo.com",
-        "roberto.pereira@outlook.com", "fernanda.santos@gmail.com", "lucas.rodrigues@hotmail.com",
-        "juliana.silva@yahoo.com", "paulo.carvalho@gmail.com", "beatriz.martins@outlook.com",
-        "gabriel.ribeiro@gmail.com", "camila.goncalves@hotmail.com", "diego.barbosa@gmail.com",
-        "larissa.monteiro@yahoo.com", "rafael.cardoso@outlook.com", "priscila.freitas@gmail.com",
-        "thiago.cavalcanti@hotmail.com", "amanda.correia@gmail.com", "bruno.moreira@yahoo.com",
-        "vanessa.nunes@outlook.com", "rodrigo.melo@gmail.com",
+        "roberto.pereira@outlook.com", "fernanda.santos@gmail.com",
+        "lucas.rodrigues@hotmail.com", "juliana.silva@yahoo.com",
+        "paulo.carvalho@gmail.com", "beatriz.martins@outlook.com",
+        "gabriel.ribeiro@gmail.com", "camila.goncalves@hotmail.com",
+        "diego.barbosa@gmail.com", "larissa.monteiro@yahoo.com",
+        "rafael.cardoso@outlook.com", "priscila.freitas@gmail.com",
+        "thiago.cavalcanti@hotmail.com", "amanda.correia@gmail.com",
+        "bruno.moreira@yahoo.com", "vanessa.nunes@outlook.com",
+        "rodrigo.melo@gmail.com",
     ]
 
     emails_falsos = [
@@ -277,41 +361,46 @@ def gerar_dados_sinteticos() -> tuple[list[dict], list[int]]:
         "a1234@trashmail.com", "b9876@tempmail.com", "x123@throwam.com",
         "asdf@fakeinbox.com", "zz@10minutemail.com", "aa@spambog.com",
         "temp@getnada.com", "bot@discard.email", "trash@maildrop.cc",
-        "x@x.com", "a@b.c", "123@456.com",
-        "noreply@fake.net", "void@null.com", "noone@nowhere.org",
-        "q1w2e3@trashmail.io", "abc123@sharklasers.com", "dgagfaugfia172@gmail.com", "naoexisto29783@gmai.com",
-        "falsotest@outlook.com", "spamspamspam129875@hotmail.com", "aposteaqui@gmail.com", "xkqwzmn88@gmail.com",
-        "bvrtplxk91@hotmail.com", "wqzxmnbv44@outlook.com", "kplxqwrtz77@yahoo.com", "zxcvbnmqw33@gmail.com", 
-        "dghjklmnpq@gmail.com", "bcdfghjklm@hotmail.com", "qwrtpsdfgh@outlook.com", "zxcvbnmpqr@yahoo.com", "mnbvcxzlkj@gmail.com",
-        "1234567890@gmail.com", "9988776655@hotmail.com","1122334455@outlook.com", "0987654321@yahoo.com", "1111222233@gmail.com",
-        "brunosantos19283@gmail.com", "fernandaoliveira28374@hotmail.com", "thiagoribeiro91827@outlook.com", "camilaferreira37261@yahoo.com", 
-        "rodrigomartins46372@gmail.com", "maria29837461@gmail.com", "joao88712634@hotmail.com", "pedro11029374@outlook.com",
-        "ana99182736@yahoo.com", "lucas77261534@gmail.com", "abcdefghijklmnopqrstu@gmail.com","aaabbbcccdddeeefffggg@hotmail.com",
-        "xyzxyzxyzxyzxyzxyz99@outlook.com", "testetetestetestetest@yahoo.com", "randomrandomrandomrr1@gmail.com",
-
+        "x@x.com", "a@b.c", "123@456.com", "noreply@fake.net",
+        "void@null.com", "noone@nowhere.org", "q1w2e3@trashmail.io",
+        "abc123@sharklasers.com", "dgagfaugfia172@gmail.com",
+        "naoexisto29783@gmai.com", "xkqwzmn88@gmail.com",
+        "bvrtplxk91@hotmail.com", "wqzxmnbv44@outlook.com",
+        "1234567890@gmail.com", "9988776655@hotmail.com",
+        "abcdefghijklmnopqrstu@gmail.com", "randomrandomrandomrr1@gmail.com",
+        "spamspamspam129875@hotmail.com",
     ]
 
     telefones_reais = [
-        "11987654321", "21976543210", "31965432109", "41954321098", "51943210987",
-        "61932109876", "71921098765", "81910987654", "91909876543", "11876543210",
-        "21865432109", "31854321098", "41843210987", "51832109876", "61821098765",
-        "71810987654", "81809876543", "91898765432", "11987123456", "21976234567",
+        "11987654321", "21976543210", "31965432109", "41954321098",
+        "51943210987", "61932109876", "71921098765", "81910987654",
+        "91909876543", "11876543210", "21865432109", "31854321098",
+        "41843210987", "51832109876", "61821098765", "71810987654",
+        "81809876543", "91898765432", "11987123456", "21976234567",
     ]
 
     telefones_falsos = [
+        "11900000000", "11911111111", "11922222222", "21901234567",
+        "31912121212", "41900011122", "51911111112", "61900000001",
+        "71900000000", "81912345678", "85912340000", "92900000000",
+        "98912345678", "62911111111", "67900000000", "1133334444",
+        "2122223333", "3133334444", "4133334444", "5133334444",
+    ]
 
-    "11900000000", "11911111111", "11922222222", "11933333333", "11944444444", "21901234567", "21912345678", "21923456789",
-    "21934567890", "21987654321", "31912121212", "31923232323", "31934343434", "31945454545", "31956565656", "41900011122",
-    "41911122233", "41922233344", "41933344455", "41910203040", "51911111112", "51922222223", "51933333334", "51944444445",
-    "51901010101", "61900000001", "61910000000", "61900000100", "61900010001", "61911001100", "71900000000", "71911111111",
-    "71999999990", "71988888881", "71977777772", "81912345678", "81998765432", "81911223344", "81900102030", "81955443322",
-    "85912340000", "85900001234", "85911110000", "85900000123", "85912121212", "92900000000", "92911111110", "92922222221", 
-    "92933333332", "92999999998",
+    ongs_reais = [
+        "Lar dos Anjos", "Instituto Esperança", "Fundação Vida Nova",
+        "Associação Mãos Solidárias", "ONG Recomeço", "Projeto Semente",
+        "Casa da Criança Feliz", "Centro Comunitário Luz", "Abrigo São Francisco",
+        "Instituto Novo Horizonte", "Associação Bem Querer", "Fundação Caminhos",
+        "ONG Raízes", "Projeto Florescer", "Centro de Apoio Familiar",
+        "Instituto Cidadania Ativa", "Lar Esperança Viva", "ONG Mãe Terra",
+        "Fundação Passos de Luz", "Associação Renascer",
+    ]
 
-    "98912345678", "62911111111", "67900000000", "68912121212", "96901234567", "95911223344", "94912345678", "93900000001", 
-    "69901010101", "63911111112", "1133334444", "2122223333", "3133334444", "4133334444", "5133334444", "98912345678", 
-    "62911111111", "67900000000", "68912121212", "96901234567", "95911223344", "94912345678", "93900000001", "69901010101",
-    "63911111112", "1133334444", "2122223333", "3133334444", "4133334444", "5133334444",
+    ongs_falsas = [
+        "teste", "ong teste", "nenhuma", "fake", "asdf", "qwerty",
+        "n/a", "na", "admin", "null", "ong fake", "qualquer",
+        "123", "ong 123", "xpto", "abc", "tt", "zz", "aa bb", "ff gg",
     ]
 
     mensagens_reais = [
@@ -345,29 +434,31 @@ def gerar_dados_sinteticos() -> tuple[list[dict], list[int]]:
 
     for _ in range(60):
         registros.append({
-            "nome":      random.choice(nomes_reais),
-            "email":     random.choice(emails_reais),
-            "telefone":  random.choice(telefones_reais),
-            "mensagem":  random.choice(mensagens_reais),
+            "nome"     : random.choice(nomes_reais),
+            "email"    : random.choice(emails_reais),
+            "telefone" : random.choice(telefones_reais),
+            "ong"      : random.choice(ongs_reais),
+            "mensagem" : random.choice(mensagens_reais),
         })
         rotulos.append(0)  # real
 
     for _ in range(60):
         registros.append({
-            "nome":      random.choice(nomes_falsos),
-            "email":     random.choice(emails_falsos),
-            "telefone":  random.choice(telefones_falsos),
-            "mensagem":  random.choice(mensagens_falsas),
+            "nome"     : random.choice(nomes_falsos),
+            "email"    : random.choice(emails_falsos),
+            "telefone" : random.choice(telefones_falsos),
+            "ong"      : random.choice(ongs_falsas),
+            "mensagem" : random.choice(mensagens_falsas),
         })
         rotulos.append(1)  # falso
 
     return registros, rotulos
 
 
+# ─── Inicialização ────────────────────────────────────────────────────────────
+
 def inicializar_modelo():
-    """
-    Se o modelo do ML ainda não existir, será treinado com os dados mencionados acima.
-    """
+    """Treina com dados sintéticos se o modelo ainda não existir."""
     if not os.path.exists(MODEL_PATH):
         print("[ML] Modelo não encontrado. Treinando com dados sintéticos...")
         registros, rotulos = gerar_dados_sinteticos()
@@ -376,7 +467,5 @@ def inicializar_modelo():
     else:
         print("[ML] Modelo carregado com sucesso.")
 
-# Vai chamar a função quando o arquivo for importado.
-inicializar_modelo()
 
-print(importancia_features())
+inicializar_modelo()

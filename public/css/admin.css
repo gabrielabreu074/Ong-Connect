@@ -214,3 +214,292 @@ td{
   padding-top: 10px;
 }
 }
+
+/* ── Score de veracidade ─────────────────────────────────────────────────── */
+.col-score { min-width: 130px; }
+
+.score-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.score-barra-bg {
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.score-barra-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease;
+}
+
+.score-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.score-pct {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.score-rotulo {
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+/* Verde — provável real */
+.score-alto .score-barra-fill { background: #22c55e; }
+.score-alto .score-pct        { color: #166534; }
+.score-alto .score-rotulo     { background: #dcfce7; color: #166534; }
+
+/* Amarelo — incerto */
+.score-medio .score-barra-fill { background: #f59e0b; }
+.score-medio .score-pct        { color: #92400e; }
+.score-medio .score-rotulo     { background: #fef3c7; color: #92400e; }
+
+/* Vermelho — suspeito */
+.score-baixo .score-barra-fill { background: #ef4444; }
+.score-baixo .score-pct        { color: #991b1b; }
+.score-baixo .score-rotulo     { background: #fee2e2; color: #991b1b; }
+
+.score-indefinido { color: #aaa; font-style: italic; font-size: 13px; }
+
+/* ── Coluna mensagem ─────────────────────────────────────────────────────── */
+.col-mensagem { max-width: 200px; font-size: 13px; color: #555; line-height: 1.4; }
+.sem-mensagem { color: #aaa; font-style: italic; }
+
+.btn-ver-mensagem {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 2px 8px;
+    font-size: 12px;
+    background: transparent;
+    border: 1px solid #888;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #444;
+    transition: background 0.15s;
+}
+.btn-ver-mensagem:hover { background: #f0f0f0; }
+
+/* ── Modal ───────────────────────────────────────────────────────────────── */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+.modal-box {
+    background: #fff;
+    border-radius: 10px;
+    padding: 28px 32px;
+    max-width: 480px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+.modal-box h3 { margin: 0 0 14px; font-size: 17px; font-weight: 600; color: #222; }
+.modal-box p  { font-size: 15px; line-height: 1.6; color: #444; white-space: pre-wrap; margin: 0 0 20px; }
+.modal-box button {
+    padding: 8px 22px;
+    border: none;
+    border-radius: 6px;
+    background: #22543d;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.modal-box button:hover { background: #1a3d2d; }
+
+/* ── Tabela responsiva ───────────────────────────────────────────────────── */
+.tables {
+    width: 100%;
+    overflow-x: auto;          /* scroll horizontal no mobile */
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+}
+
+.tables table {
+    width: 100%;
+    min-width: 700px;          /* impede a tabela de esmagar abaixo disso */
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.tables th,
+.tables td {
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;       /* evita quebra de linha nas células */
+}
+
+/* Colunas que podem quebrar linha */
+.tables td.col-mensagem,
+.tables td:nth-child(2) {      /* nome */
+    white-space: normal;
+    min-width: 100px;
+    max-width: 160px;
+}
+
+/* ── Score de veracidade ─────────────────────────────────────────────────── */
+.col-score { min-width: 130px; }
+
+.score-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.score-barra-bg {
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.score-barra-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease;
+}
+
+.score-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.score-pct {
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.score-rotulo {
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Verde */
+.score-alto .score-barra-fill { background: #22c55e; }
+.score-alto .score-pct        { color: #166534; }
+.score-alto .score-rotulo     { background: #dcfce7; color: #166534; }
+
+/* Amarelo */
+.score-medio .score-barra-fill { background: #f59e0b; }
+.score-medio .score-pct        { color: #92400e; }
+.score-medio .score-rotulo     { background: #fef3c7; color: #92400e; }
+
+/* Vermelho */
+.score-baixo .score-barra-fill { background: #ef4444; }
+.score-baixo .score-pct        { color: #991b1b; }
+.score-baixo .score-rotulo     { background: #fee2e2; color: #991b1b; }
+
+.score-indefinido { color: #aaa; font-style: italic; font-size: 13px; }
+
+/* ── Coluna mensagem ─────────────────────────────────────────────────────── */
+.col-mensagem {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.4;
+    min-width: 120px;
+    max-width: 180px;
+    white-space: normal;
+}
+
+.sem-mensagem { color: #aaa; font-style: italic; }
+
+.btn-ver-mensagem {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 2px 8px;
+    font-size: 12px;
+    background: transparent;
+    border: 1px solid #888;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #444;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+.btn-ver-mensagem:hover { background: #f0f0f0; }
+
+/* ── Botões de ação ──────────────────────────────────────────────────────── */
+.btn-editar,
+.btn-excluir {
+    padding: 5px 10px;
+    font-size: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* ── Modal ───────────────────────────────────────────────────────────────── */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 16px;
+}
+
+.modal-box {
+    background: #fff;
+    border-radius: 10px;
+    padding: 24px;
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+
+.modal-box h3 { margin: 0 0 14px; font-size: 17px; font-weight: 600; color: #222; }
+.modal-box p  { font-size: 15px; line-height: 1.6; color: #444; white-space: pre-wrap; margin: 0 0 20px; }
+.modal-box button {
+    padding: 8px 22px;
+    border: none;
+    border-radius: 6px;
+    background: #22543d;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.modal-box button:hover { background: #1a3d2d; }
+
+/* ── Indicador de scroll no mobile ──────────────────────────────────────── */
+@media (max-width: 768px) {
+    .tables::after {
+        content: "← deslize para ver mais →";
+        display: block;
+        text-align: center;
+        font-size: 11px;
+        color: #aaa;
+        padding: 6px 0 2px;
+    }
+
+    .tables th,
+    .tables td {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+}

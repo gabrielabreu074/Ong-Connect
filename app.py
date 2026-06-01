@@ -39,13 +39,19 @@ init_db()
 
 
 def _campos_obrigatorios(dados: dict) -> bool:
+    """Valida que nome, email, telefone e ong foram enviados e não estão vazios."""
     return all(dados.get(c) for c in ("nome", "email", "telefone", "ong"))
 
 
-# ── Rotas da API ──────────────────────────────────────────────────────────────
+# ── Voluntários ───────────────────────────────────────────────────────────────
 
 @app.route('/api/voluntarios', methods=['GET'])
 def listar_voluntarios():
+    """
+    Lista voluntários com filtros opcionais:
+      ?predicao=real|falso
+      ?apenas_suspeitos=1
+    """
     conn     = get_db()
     predicao = request.args.get('predicao')
     so_sus   = request.args.get('apenas_suspeitos')
@@ -68,41 +74,82 @@ def listar_voluntarios():
 
 @app.route('/api/voluntarios', methods=['POST'])
 def cadastrar_voluntario():
+    """
+    Cadastra um novo voluntário.
+    Campos obrigatórios: nome, email, telefone, ong
+    Campo opcional: mensagem (motivo pelo qual quer ajudar a ONG)
+
+    Retorna 422 se o ML detectar cadastro falso.
+    Retorna 201 com os dados do cadastro e resultado do ML se aprovado.
+    """
     dados = request.get_json()
 
+    if not dados:
+        return jsonify({'erro': 'Corpo da requisição inválido ou ausente.'}), 400
+
     if not _campos_obrigatorios(dados):
-        return jsonify({'erro': 'Campos obrigatórios faltando.'}), 400
+        return jsonify({'erro': 'Campos obrigatórios faltando: nome, email, telefone, ong.'}), 400
 
     resultado = prever(dados)
 
     if not resultado['aprovado']:
         return jsonify({
-            'erro': 'Cadastro bloqueado pelo detector de voluntários falsos.',
+            'erro': 'Cadastro bloqueado: possível voluntário falso detectado.',
             'ml'  : resultado,
         }), 422
 
     conn = get_db()
-    conn.execute('''
+    cursor = conn.execute('''
         INSERT INTO voluntarios
             (nome, email, telefone, ong, mensagem,
              score_ml, predicao_ml, modelo_usado)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
-        dados['nome'], dados['email'], dados['telefone'],
-        dados['ong'],  dados.get('mensagem', ''),
+        dados['nome'],
+        dados['email'],
+        dados['telefone'],
+        dados['ong'],
+        dados.get('mensagem', ''),
         resultado['score_ml'],
         resultado['predicao'],
         1 if resultado['modelo_usado'] else 0,
     ))
     conn.commit()
+    novo_id = cursor.lastrowid
     conn.close()
-    return jsonify({'mensagem': 'Cadastro realizado!', 'ml': resultado}), 201
+
+    return jsonify({
+        'mensagem'  : 'Cadastro realizado com sucesso!',
+        'id'        : novo_id,
+        'ml'        : resultado,
+    }), 201
+
+
+@app.route('/api/voluntarios/<int:id>', methods=['GET'])
+def buscar_voluntario(id):
+    """Retorna os dados de um voluntário específico pelo ID."""
+    conn = get_db()
+    row  = conn.execute('SELECT * FROM voluntarios WHERE id = ?', (id,)).fetchone()
+    conn.close()
+
+    if not row:
+        return jsonify({'erro': 'Voluntário não encontrado.'}), 404
+
+    return jsonify(dict(row))
 
 
 @app.route('/api/voluntarios/<int:id>', methods=['PUT'])
 def editar_voluntario(id):
+    """
+    Atualiza os dados de um voluntário.
+    Roda o ML novamente — bloqueia se o novo cadastro for detectado como falso.
+    """
     dados = request.get_json()
-    conn  = get_db()
+
+    if not dados:
+        return jsonify({'erro': 'Corpo da requisição inválido ou ausente.'}), 400
+
+    conn = get_db()
 
     if not conn.execute('SELECT id FROM voluntarios WHERE id = ?', (id,)).fetchone():
         conn.close()
@@ -113,7 +160,7 @@ def editar_voluntario(id):
     if not resultado['aprovado']:
         conn.close()
         return jsonify({
-            'erro': 'Atualização bloqueada pelo detector.',
+            'erro': 'Atualização bloqueada: possível voluntário falso detectado.',
             'ml'  : resultado,
         }), 422
 
@@ -123,56 +170,79 @@ def editar_voluntario(id):
             score_ml=?, predicao_ml=?, modelo_usado=?
         WHERE id=?
     ''', (
-        dados.get('nome'), dados.get('email'),
-        dados.get('telefone'), dados.get('ong'),
+        dados.get('nome'),
+        dados.get('email'),
+        dados.get('telefone'),
+        dados.get('ong'),
         dados.get('mensagem', ''),
-        resultado['score_ml'], resultado['predicao'],
+        resultado['score_ml'],
+        resultado['predicao'],
         1 if resultado['modelo_usado'] else 0,
         id,
     ))
     conn.commit()
     conn.close()
-    return jsonify({'mensagem': 'Dados atualizados!', 'ml': resultado})
+
+    return jsonify({'mensagem': 'Dados atualizados com sucesso!', 'ml': resultado})
 
 
 @app.route('/api/voluntarios/<int:id>', methods=['DELETE'])
 def excluir_voluntario(id):
+    """Remove um voluntário pelo ID."""
     conn = get_db()
+
     if not conn.execute('SELECT id FROM voluntarios WHERE id = ?', (id,)).fetchone():
         conn.close()
         return jsonify({'erro': 'Voluntário não encontrado.'}), 404
+
     conn.execute('DELETE FROM voluntarios WHERE id = ?', (id,))
     conn.commit()
     conn.close()
-    return jsonify({'mensagem': 'Excluído com sucesso!'})
+
+    return jsonify({'mensagem': 'Voluntário excluído com sucesso!'})
 
 
-# ── Rotas de Machine Learning ─────────────────────────────────────────────────
+# ── Machine Learning ──────────────────────────────────────────────────────────
 
 @app.route('/api/ml/prever', methods=['POST'])
 def prever_externo():
-    """Testa o modelo com dados avulsos sem salvar no banco."""
+    """
+    Testa o modelo ML com dados avulsos, sem salvar no banco.
+    Útil para testar o detector antes de integrar ao frontend.
+
+    Body: { nome, email, telefone, ong, mensagem }
+    """
     dados = request.get_json()
+
+    if not dados:
+        return jsonify({'erro': 'Corpo da requisição inválido ou ausente.'}), 400
+
     if not _campos_obrigatorios(dados):
-        return jsonify({'erro': 'Campos obrigatórios faltando.'}), 400
+        return jsonify({'erro': 'Campos obrigatórios faltando: nome, email, telefone, ong.'}), 400
+
     return jsonify(prever(dados))
 
 
 @app.route('/api/ml/importancia', methods=['GET'])
 def importancia():
-    """Mostra quais características mais influenciam o modelo."""
+    """
+    Retorna o ranking de quais features mais influenciam o modelo.
+    Útil para entender o que o modelo está aprendendo.
+    """
     return jsonify(importancia_features())
 
 
 @app.route('/api/ml/status', methods=['GET'])
 def status_ml():
-    """Resumo do estado atual do modelo."""
+    """
+    Retorna o status atual do modelo ML e estatísticas do banco.
+    """
     from ml_detector import MODEL_PATH
 
-    conn        = get_db()
-    total       = conn.execute("SELECT COUNT(*) FROM voluntarios").fetchone()[0]
-    falsos_pred = conn.execute("SELECT COUNT(*) FROM voluntarios WHERE predicao_ml='falso'").fetchone()[0]
-    reais_pred  = conn.execute("SELECT COUNT(*) FROM voluntarios WHERE predicao_ml='real'").fetchone()[0]
+    conn         = get_db()
+    total        = conn.execute("SELECT COUNT(*) FROM voluntarios").fetchone()[0]
+    falsos_pred  = conn.execute("SELECT COUNT(*) FROM voluntarios WHERE predicao_ml='falso'").fetchone()[0]
+    reais_pred   = conn.execute("SELECT COUNT(*) FROM voluntarios WHERE predicao_ml='real'").fetchone()[0]
     conn.close()
 
     modelo_existe = os.path.exists(MODEL_PATH)
@@ -187,15 +257,24 @@ def status_ml():
     })
 
 
+# ── Estatísticas ──────────────────────────────────────────────────────────────
+
 @app.route('/api/voluntarios/estatisticas', methods=['GET'])
 def estatisticas():
+    """Resumo geral dos cadastros no banco."""
     conn = get_db()
     total        = conn.execute("SELECT COUNT(*) FROM voluntarios").fetchone()[0]
     reais        = conn.execute("SELECT COUNT(*) FROM voluntarios WHERE predicao_ml='real'").fetchone()[0]
     falsos       = conn.execute("SELECT COUNT(*) FROM voluntarios WHERE predicao_ml='falso'").fetchone()[0]
     sem_predicao = conn.execute("SELECT COUNT(*) FROM voluntarios WHERE predicao_ml IS NULL").fetchone()[0]
     conn.close()
-    return jsonify({'total': total, 'reais': reais, 'falsos': falsos, 'sem_predicao': sem_predicao})
+
+    return jsonify({
+        'total'        : total,
+        'reais'        : reais,
+        'falsos'       : falsos,
+        'sem_predicao' : sem_predicao,
+    })
 
 
 # ── Front-end ─────────────────────────────────────────────────────────────────
@@ -207,6 +286,9 @@ def index():
 @app.route('/<path:filename>.html')
 def serve_html(filename):
     return send_from_directory('public/html', f'{filename}.html')
+
+
+# ── Inicialização ─────────────────────────────────────────────────────────────
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
