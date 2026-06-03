@@ -14,24 +14,36 @@
 </head>
 <body>
     <header class="header">
-        <div class="logo-area">
-            <!-- Certifique-se de que a imagem está em public/assets/ -->
-            <img src="/assets/logo site ongs.png" alt="Logo ONG Connect">
-        </div>
- 
-        <nav class="menu">
+    <div class="logo-area">
+        <img src="/assets/logo site ongs.png" alt="Logo ONG Connect">
+    </div>
+
+    <nav class="menu">
+        <a href="index.html">Home</a>
+        <a href="ongs.html">ONGs</a>
+        <a href="ajude.html">Ajude</a>
+        <a class="adm" href="admin.html">Admin</a>
+    </nav>
+
+    <nav class="navh">
+        <button class="menuh">
+            <i class="bi bi-list"></i>
+        </button>
+    </nav>
+
+    <section class="menu-mobile-container">
+        <nav class="menu-mobile">
             <a href="index.html">Home</a>
             <a href="ongs.html">ONGs</a>
             <a href="ajude.html">Ajude</a>
-            <a class="adm" href="admin.html">Admin</a>
+            <a href="admin.html">Admin</a>
         </nav>
-
-        <!-- ... resto do código ... -->
-    </header>
+    </section>
+</header>
     <main class="main">
         <h1>Conectando quem quer ajudar com quem precisa</h1>
         <h4>Encontre ONGs, se voluntarie e transforme vidas</h4>
-        <!-- Link corrigido -->
+
         <button class="serv" id="ajude"><a href="ongs.html">Quero ajudar agora</a></button>
         <div class="carrossel">
             <img id="imagem" src="/assets/Homeimg.webp" alt="">
@@ -53,7 +65,7 @@
             <h4>ONG Connect</h4>
         </nav>
     </footer>
-    <!-- Scripts também sem o /public/ -->
+
     <script src="/js/ongs.js"></script>
     <script src="/js/script.js"></script>
 </body>

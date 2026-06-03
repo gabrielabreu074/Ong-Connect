@@ -246,6 +246,10 @@ textarea{
     justify-content: space-between;
     padding-left: 10px;
   }
+  
+  .container22{
+    padding: 0px 0px 0px 40px;
+  }
 
   .menu{
     display: none;
