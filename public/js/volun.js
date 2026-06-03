@@ -18,19 +18,13 @@ const form = document.getElementById("volunteerForm");
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const nome = document.getElementById("nome").value.trim();
-    const email = document.getElementById("email").value.trim();
+    const nome     = document.getElementById("nome").value.trim();
+    const email    = document.getElementById("email").value.trim();
     const telefone = document.getElementById("telefone").value.trim();
-    const ong = document.getElementById("ongs").value;
+    const ong      = document.getElementById("ongs").value;
     const mensagem = document.getElementById("mensagem").value.trim();
 
-    const voluntario = {
-        nome,
-        email,
-        telefone,
-        ong,
-        mensagem
-    };
+    const voluntario = { nome, email, telefone, ong, mensagem };
 
     try {
         const response = await fetch('/api/voluntarios', {
@@ -40,33 +34,49 @@ form.addEventListener("submit", async (e) => {
         });
 
         if (response.ok) {
-            mostrarAlerta("Cadastro realizado com sucesso!");
+            mostrarAlerta("✓ Cadastro realizado com sucesso!", "sucesso");
             form.reset();
         } else {
             const erro = await response.json();
-            mostrarAlerta("Erro: " + (erro.erro || "Falha ao cadastrar."));
+
+            // Cadastro bloqueado pelo ML — mostra os motivos
+            if (response.status === 422 && erro.ml?.motivos?.length > 0) {
+                const lista = erro.ml.motivos.map(m => `• ${m}`).join('\n');
+                mostrarAlerta(`Cadastro bloqueado:\n\n${lista}`, "erro", 8000);
+            } else {
+                mostrarAlerta("Erro: " + (erro.erro || "Falha ao cadastrar."), "erro");
+            }
         }
     } catch (error) {
-        mostrarAlerta("Erro de conexão com o servidor.");
+        mostrarAlerta("Erro de conexão com o servidor. Verifique se o servidor está rodando.", "erro");
     }
 });
 
-function mostrarAlerta(texto) {
+function mostrarAlerta(texto, tipo = "sucesso", duracao = 4000) {
+    // Remove alerta anterior se existir
+    const anterior = document.getElementById("alerta-ml");
+    if (anterior) anterior.remove();
+
     const alerta = document.createElement("div");
+    alerta.id = "alerta-ml";
     alerta.innerText = texto;
-    alerta.style.position = "fixed";
-    alerta.style.top = "20px";
-    alerta.style.right = "20px";
-    alerta.style.backgroundColor = "#22c55e";
-    alerta.style.color = "#fff";
-    alerta.style.padding = "15px 20px";
-    alerta.style.borderRadius = "8px";
-    alerta.style.boxShadow = "0 0 10px rgba(0,0,0,0.2)";
-    alerta.style.zIndex = "9999";
+
+    Object.assign(alerta.style, {
+        position:     "fixed",
+        top:          "20px",
+        right:        "20px",
+        maxWidth:     "360px",
+        backgroundColor: tipo === "sucesso" ? "#22c55e" : "#ef4444",
+        color:        "#fff",
+        padding:      "15px 20px",
+        borderRadius: "8px",
+        boxShadow:    "0 4px 12px rgba(0,0,0,0.2)",
+        zIndex:       "9999",
+        whiteSpace:   "pre-line",
+        lineHeight:   "1.5",
+        fontSize:     "14px",
+    });
 
     document.body.appendChild(alerta);
-
-    setTimeout(() => {
-        alerta.remove();
-    }, 3000);
+    setTimeout(() => alerta.remove(), duracao);
 }
