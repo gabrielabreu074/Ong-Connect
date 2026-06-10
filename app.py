@@ -76,7 +76,6 @@ def listar_voluntarios():
 
     return jsonify(resultado)
 @app.route('/api/voluntarios', methods=['POST'])
-@app.route('/api/voluntarios', methods=['POST'])
 def cadastrar_voluntario():
     dados = request.get_json()
 
@@ -130,7 +129,7 @@ def editar_voluntario(id):
         json.dumps(resultado.get('alertas', []), ensure_ascii=False),
         resultado.get('motivo', ''),
         id,
-        id,
+        
     ))
     conn.commit()
     conn.close()
@@ -165,7 +164,12 @@ def estatisticas():
 
 @app.route('/')
 def index():
-    return send_from_directory('public/html', 'index.html')
+    caminho = os.path.join(BASE_DIR, 'public', 'html')
+
+    if not os.path.exists(os.path.join(caminho, 'index.html')):
+        return "API funcionando!", 200
+
+    return send_from_directory(caminho, 'index.html')
 
 @app.route('/<path:filename>.html')
 def serve_html(filename):
