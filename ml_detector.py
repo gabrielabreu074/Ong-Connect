@@ -111,11 +111,12 @@ def _so_digitos(texto: str) -> str:
 
 # ── Score da mensagem (NLP) ───────────────────────────────────────────────────
 def _score_mensagem(mensagem: str) -> tuple[float, str]:
-    _carregar_embeddings()
     texto = mensagem.strip() if mensagem else ""
 
     if len(texto) < 10:
         return 0.15, "mensagem ausente ou muito curta"
+
+    _carregar_embeddings()   # ← ADICIONE ESTA LINHA
 
     modelo = _carregar_modelo()
     emb    = modelo.encode(texto, convert_to_tensor=True)
@@ -218,3 +219,8 @@ def prever(dados: dict) -> dict:
     "motivo": motivo,
     "alertas": alertas,
 }
+# Pré-carrega o modelo e os embeddings
+try:
+    _carregar_embeddings()
+except Exception as e:
+    print(f"[ML] Erro ao inicializar NLP: {e}")
