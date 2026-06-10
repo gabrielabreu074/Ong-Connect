@@ -164,12 +164,10 @@ def estatisticas():
 
 @app.route('/')
 def index():
-    caminho = os.path.join(BASE_DIR, 'public', 'html')
-
-    if not os.path.exists(os.path.join(caminho, 'index.html')):
-        return "API funcionando!", 200
-
-    return send_from_directory(caminho, 'index.html')
+    return jsonify({
+        "status": "ok",
+        "mensagem": "Flask funcionando"
+    })
 
 @app.route('/<path:filename>.html')
 def serve_html(filename):
