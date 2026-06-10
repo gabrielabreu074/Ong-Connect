@@ -19,11 +19,11 @@ def _carregar_modelo():
     global _MODELO_NLP
     if _MODELO_NLP is None:
         print("[ML] Carregando modelo NLP...")
-        _MODELO_NLP = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+        _MODELO_NLP = SentenceTransformer("paraphrase-MiniLM-L3-v2")
         print("[ML] Modelo NLP pronto.")
     return _MODELO_NLP
 
-_carregar_modelo()
+
 
 # ── Referências semânticas ────────────────────────────────────────────────────
 MENSAGENS_GENUINAS = [
@@ -54,10 +54,29 @@ MENSAGENS_RUINS = [
     "asdf qwer zxcv",
 ]
 
-# Pré-computa embeddings uma vez na inicialização
-_modelo       = _carregar_modelo()
-_EMB_GENUINAS = _modelo.encode(MENSAGENS_GENUINAS, convert_to_tensor=True)
-_EMB_RUINS    = _modelo.encode(MENSAGENS_RUINS,    convert_to_tensor=True)
+# Embeddings carregados sob demanda
+_EMB_GENUINAS = None
+_EMB_RUINS = None
+
+def _carregar_embeddings():
+    global _EMB_GENUINAS, _EMB_RUINS
+
+    if _EMB_GENUINAS is None or _EMB_RUINS is None:
+        modelo = _carregar_modelo()
+
+        print("[ML] Gerando embeddings...")
+
+        _EMB_GENUINAS = modelo.encode(
+            MENSAGENS_GENUINAS,
+            convert_to_tensor=True
+        )
+
+        _EMB_RUINS = modelo.encode(
+            MENSAGENS_RUINS,
+            convert_to_tensor=True
+        )
+
+        print("[ML] Embeddings prontos.")
 
 # ── Listas de validação ───────────────────────────────────────────────────────
 DOMINIOS_DESCARTAVEIS = {
@@ -92,6 +111,7 @@ def _so_digitos(texto: str) -> str:
 
 # ── Score da mensagem (NLP) ───────────────────────────────────────────────────
 def _score_mensagem(mensagem: str) -> tuple[float, str]:
+    _carregar_embeddings()
     texto = mensagem.strip() if mensagem else ""
 
     if len(texto) < 10:
