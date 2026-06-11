@@ -17,12 +17,17 @@ _MODELO_NLP = None
 
 def _carregar_modelo():
     global _MODELO_NLP
-    if _MODELO_NLP is None:
-        print("[ML] Carregando modelo NLP...")
-        _MODELO_NLP = SentenceTransformer("paraphrase-MiniLM-L3-v2")
-        print("[ML] Modelo NLP pronto.")
-    return _MODELO_NLP
 
+    if _MODELO_NLP is not None:
+        return _MODELO_NLP
+
+    print("[ML] carregando modelo (lazy total)...")
+
+    from sentence_transformers import SentenceTransformer
+    _MODELO_NLP = SentenceTransformer("paraphrase-MiniLM-L3-v2")
+
+    print("[ML] modelo pronto")
+    return _MODELO_NLP
 
 
 # ── Referências semânticas ────────────────────────────────────────────────────
@@ -68,15 +73,18 @@ def _carregar_embeddings():
     if _EMB_GENUINAS is not None and _EMB_RUINS is not None:
         return
 
-    print("[ML] carregando embeddings sob demanda...")
+    with _LOCK:
+        if _EMB_GENUINAS is not None and _EMB_RUINS is not None:
+            return
 
-    modelo = _carregar_modelo()
+        print("[ML] carregando embeddings sob demanda...")
 
-    _EMB_GENUINAS = modelo.encode(MENSAGENS_GENUINAS[:5], convert_to_tensor=True)
-    _EMB_RUINS = modelo.encode(MENSAGENS_RUINS[:5], convert_to_tensor=True)
+        modelo = _carregar_modelo()
 
-    print("[ML] embeddings prontos")
+        _EMB_GENUINAS = modelo.encode(MENSAGENS_GENUINAS[:5], convert_to_tensor=True)
+        _EMB_RUINS = modelo.encode(MENSAGENS_RUINS[:5], convert_to_tensor=True)
 
+        print("[ML] embeddings prontos")
 # ── Listas de validação ───────────────────────────────────────────────────────
 DOMINIOS_DESCARTAVEIS = {
     "mailinator.com", "guerrillamail.com", "trashmail.com", "yopmail.com",
