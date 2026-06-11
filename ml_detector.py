@@ -10,7 +10,7 @@ import re
 import os
 import unicodedata
 import numpy as np
-from sentence_transformers import SentenceTransformer, util
+
 
 # ── Modelo NLP ────────────────────────────────────────────────────────────────
 _MODELO_NLP = None
@@ -118,6 +118,8 @@ def _so_digitos(texto: str) -> str:
 
 # ── Score da mensagem (NLP) ───────────────────────────────────────────────────
 def _score_mensagem(mensagem: str) -> tuple[float, str]:
+    from sentence_transformers import util
+    
     texto = mensagem.strip() if mensagem else ""
 
     if len(texto) < 10:
