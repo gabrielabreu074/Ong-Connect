@@ -5,9 +5,11 @@ Analisador de qualidade de voluntários usando NLP (sentence-transformers).
 - Score reflete qualidade genuína da mensagem
 - Validações de email/telefone/nome reduzem score mas não bloqueiam
 """
+import os
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 import re
-import os
 import unicodedata
 import numpy as np
 
@@ -24,7 +26,7 @@ def _carregar_modelo():
     print("[ML] carregando modelo (lazy total)...")
 
     from sentence_transformers import SentenceTransformer
-    _MODELO_NLP = SentenceTransformer("paraphrase-MiniLM-L3-v2")
+    _MODELO_NLP = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
 
     print("[ML] modelo pronto")
     return _MODELO_NLP
