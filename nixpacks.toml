@@ -1,8 +1,5 @@
-[phases.install]
-cmds = ["/opt/venv/bin/pip install -r requirements.txt"]
-
 [phases.build]
-cmds = ["/opt/venv/bin/python download_model.py"]
+cmds = ["python download_model.py"]
 
 [start]
 cmd = "gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --worker-class gthread --threads 2 --timeout 120"
