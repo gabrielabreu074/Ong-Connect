@@ -1,7 +1,7 @@
-from sentence_transformers import SentenceTransformer
 import os
+os.environ["HF_HOME"] = "/app/.cache/huggingface"
 
-cache = os.path.expanduser("~/.cache/huggingface")
-print(f"[ML] baixando modelo para {cache}...")
-SentenceTransformer("paraphrase-MiniLM-L3-v2")
-print("[ML] modelo salvo com sucesso.")
+from sentence_transformers import SentenceTransformer
+print("[ML] baixando modelo multilingual...")
+SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+print("[ML] modelo salvo.")
