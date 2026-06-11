@@ -68,25 +68,14 @@ def _carregar_embeddings():
     if _EMB_GENUINAS is not None and _EMB_RUINS is not None:
         return
 
-    with _LOCK:
-        if _EMB_GENUINAS is not None and _EMB_RUINS is not None:
-            return
+    print("[ML] carregando embeddings sob demanda...")
 
-        print("[ML] Gerando embeddings...")
+    modelo = _carregar_modelo()
 
-        modelo = _carregar_modelo()
+    _EMB_GENUINAS = modelo.encode(MENSAGENS_GENUINAS[:5], convert_to_tensor=True)
+    _EMB_RUINS = modelo.encode(MENSAGENS_RUINS[:5], convert_to_tensor=True)
 
-        _EMB_GENUINAS = modelo.encode(
-            MENSAGENS_GENUINAS,
-            convert_to_tensor=True
-        )
-
-        _EMB_RUINS = modelo.encode(
-            MENSAGENS_RUINS,
-            convert_to_tensor=True
-        )
-
-        print("[ML] Embeddings prontos.")
+    print("[ML] embeddings prontos")
 
 # ── Listas de validação ───────────────────────────────────────────────────────
 DOMINIOS_DESCARTAVEIS = {
