@@ -58,13 +58,23 @@ MENSAGENS_RUINS = [
 _EMB_GENUINAS = None
 _EMB_RUINS = None
 
+import threading
+
+_LOCK = threading.Lock()
+
 def _carregar_embeddings():
     global _EMB_GENUINAS, _EMB_RUINS
 
-    if _EMB_GENUINAS is None or _EMB_RUINS is None:
-        modelo = _carregar_modelo()
+    if _EMB_GENUINAS is not None and _EMB_RUINS is not None:
+        return
+
+    with _LOCK:
+        if _EMB_GENUINAS is not None and _EMB_RUINS is not None:
+            return
 
         print("[ML] Gerando embeddings...")
+
+        modelo = _carregar_modelo()
 
         _EMB_GENUINAS = modelo.encode(
             MENSAGENS_GENUINAS,
@@ -219,8 +229,3 @@ def prever(dados: dict) -> dict:
     "motivo": motivo,
     "alertas": alertas,
 }
-# Pré-carrega o modelo e os embeddings
-try:
-    _carregar_embeddings()
-except Exception as e:
-    print(f"[ML] Erro ao inicializar NLP: {e}")
