@@ -1,7 +1,7 @@
 import os
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
-os.environ["TRANSFORMERS_OFFLINE"] = "1"  # evita chamadas de rede em runtime
+
 
 import re
 import unicodedata
