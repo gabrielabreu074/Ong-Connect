@@ -1,31 +1,36 @@
 """
 Analisador de qualidade de voluntários usando NLP (sentence-transformers).
-- NÃO bloqueia cadastros (aprovado sempre True)
-- Analisa o texto da textarea com NLP real (BERT multilingual)
-- Score reflete qualidade genuína da mensagem
-- Validações de email/telefone/nome reduzem score mas não bloqueiam
+
+- NÃO bloqueia cadastros
+- Analisa o texto da textarea com NLP real
+- Score reflete a qualidade da mensagem
+- Validações de email, telefone e nome reduzem score, mas não bloqueiam
 """
 
 import re
-import os
 import unicodedata
 import numpy as np
 from sentence_transformers import SentenceTransformer, util
 
+
 # ── Modelo NLP ────────────────────────────────────────────────────────────────
+
 _MODELO_NLP = None
+
 
 def _carregar_modelo():
     global _MODELO_NLP
+
     if _MODELO_NLP is None:
         print("[ML] Carregando modelo NLP...")
         _MODELO_NLP = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
         print("[ML] Modelo NLP pronto.")
+
     return _MODELO_NLP
 
-_carregar_modelo()
 
 # ── Referências semânticas ────────────────────────────────────────────────────
+
 MENSAGENS_GENUINAS = [
     "Quero ajudar crianças carentes da minha cidade e contribuir com a educação.",
     "Tenho experiência com trabalho voluntário e quero continuar fazendo a diferença.",
@@ -54,12 +59,15 @@ MENSAGENS_RUINS = [
     "asdf qwer zxcv",
 ]
 
+
 # Pré-computa embeddings uma vez na inicialização
-_modelo       = _carregar_modelo()
+_modelo = _carregar_modelo()
 _EMB_GENUINAS = _modelo.encode(MENSAGENS_GENUINAS, convert_to_tensor=True)
-_EMB_RUINS    = _modelo.encode(MENSAGENS_RUINS,    convert_to_tensor=True)
+_EMB_RUINS = _modelo.encode(MENSAGENS_RUINS, convert_to_tensor=True)
+
 
 # ── Listas de validação ───────────────────────────────────────────────────────
+
 DOMINIOS_DESCARTAVEIS = {
     "mailinator.com", "guerrillamail.com", "trashmail.com", "yopmail.com",
     "tempmail.com", "throwam.com", "sharklasers.com", "grr.la", "spam4.me",
@@ -75,22 +83,27 @@ NOMES_SUSPEITOS = {
 }
 
 DDDS_VALIDOS = {
-    11,12,13,14,15,16,17,18,19,21,22,24,27,28,
-    31,32,33,34,35,37,38,41,42,43,44,45,46,47,48,49,
-    51,53,54,55,61,62,63,64,65,66,67,68,69,
-    71,73,74,75,77,79,81,82,83,84,85,86,87,88,89,
-    91,92,93,94,95,96,97,98,99,
+    11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 24, 27, 28,
+    31, 32, 33, 34, 35, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+    51, 53, 54, 55, 61, 62, 63, 64, 65, 66, 67, 68, 69,
+    71, 73, 74, 75, 77, 79, 81, 82, 83, 84, 85, 86, 87, 88, 89,
+    91, 92, 93, 94, 95, 96, 97, 98, 99,
 }
 
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
+
 def _normalizar(texto: str) -> str:
     nfkd = unicodedata.normalize("NFKD", texto)
     return "".join(c for c in nfkd if not unicodedata.combining(c)).lower().strip()
 
+
 def _so_digitos(texto: str) -> str:
     return re.sub(r"\D", "", texto)
 
-# ── Score da mensagem (NLP) ───────────────────────────────────────────────────
+
+# ── Score da mensagem usando NLP ──────────────────────────────────────────────
+
 def _score_mensagem(mensagem: str) -> tuple[float, str]:
     texto = mensagem.strip() if mensagem else ""
 
@@ -98,12 +111,16 @@ def _score_mensagem(mensagem: str) -> tuple[float, str]:
         return 0.15, "mensagem ausente ou muito curta"
 
     modelo = _carregar_modelo()
-    emb    = modelo.encode(texto, convert_to_tensor=True)
+    emb = modelo.encode(texto, convert_to_tensor=True)
 
     sim_genuina = float(util.cos_sim(emb, _EMB_GENUINAS).max())
-    sim_ruim    = float(util.cos_sim(emb, _EMB_RUINS).max())
+    sim_ruim = float(util.cos_sim(emb, _EMB_RUINS).max())
 
-    score = float(np.clip((sim_genuina * 0.7) - (sim_ruim * 0.3) + 0.3, 0.0, 1.0))
+    score = float(np.clip(
+        (sim_genuina * 0.7) - (sim_ruim * 0.3) + 0.3,
+        0.0,
+        1.0
+    ))
 
     if score >= 0.65:
         motivo = "mensagem genuína e bem elaborada"
@@ -114,34 +131,37 @@ def _score_mensagem(mensagem: str) -> tuple[float, str]:
 
     return round(score, 4), motivo
 
+
 # ── Penalidades de validação ──────────────────────────────────────────────────
+
 def _penalidades(dados: dict) -> tuple[float, list[str]]:
-    alertas    = []
+    alertas = []
     penalidade = 0.0
 
     # E-mail
-    email   = dados.get("email", "").lower().strip()
+    email = dados.get("email", "").lower().strip()
     dominio = email.split("@")[1] if "@" in email else ""
-    local   = email.split("@")[0] if "@" in email else ""
+    local = email.split("@")[0] if "@" in email else ""
 
     if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
         alertas.append("e-mail com formato inválido")
         penalidade += 0.25
 
     if dominio in DOMINIOS_DESCARTAVEIS:
-        alertas.append("e-mail descartável/temporário")
+        alertas.append("e-mail descartável ou temporário")
         penalidade += 0.30
 
-    if re.fullmatch(r"[a-z]{6,}[0-9]{4,}@.+", local):
+    if re.fullmatch(r"[a-z]{6,}[0-9]{4,}", local):
         alertas.append("e-mail com padrão suspeito")
         penalidade += 0.15
 
     # Telefone
     tel = _so_digitos(dados.get("telefone", ""))
+
     if tel.startswith("55") and len(tel) in (12, 13):
         tel = tel[2:]
 
-    ddd    = int(tel[:2]) if len(tel) >= 2 else 0
+    ddd = int(tel[:2]) if len(tel) >= 2 else 0
     numero = tel[2:] if len(tel) >= 4 else ""
 
     if len(tel) not in (10, 11):
@@ -177,24 +197,21 @@ def _penalidades(dados: dict) -> tuple[float, list[str]]:
 
     return min(penalidade, 0.60), alertas
 
+
 # ── Função principal ──────────────────────────────────────────────────────────
+
 def prever(dados: dict) -> dict:
     score_msg, motivo = _score_mensagem(dados.get("mensagem", ""))
     penalidade, alertas = _penalidades(dados)
 
     score_final = round(max(0.0, score_msg - penalidade * 0.5), 4)
 
-    if score_final >= 0.55:
-        predicao  = "real"
-        confianca = round((score_final - 0.55) / 0.45, 4)
-    else:
-        predicao  = "falso"
-        confianca = round((0.55 - score_final) / 0.55, 4)
+    confianca = round(abs(score_final - 0.5) * 2, 4)
 
     return {
-    "score_ml": score_final,
-    "confianca": round(min(confianca, 1.0), 4),
-    "aprovado": True,
-    "motivo": motivo,
-    "alertas": alertas,
-}
+        "score_ml": score_final,
+        "confianca": round(min(confianca, 1.0), 4),
+        "aprovado": True,
+        "motivo": motivo,
+        "alertas": alertas,
+    }

@@ -22,23 +22,29 @@ def init_db():
     with get_db() as conn:
         conn.execute('''
             CREATE TABLE IF NOT EXISTS voluntarios (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome         TEXT NOT NULL,
-            email        TEXT NOT NULL,
-            telefone     TEXT NOT NULL,
-            ong          TEXT NOT NULL,
-            mensagem     TEXT,
-            score_ml     REAL DEFAULT NULL,
-            alertas_ml   TEXT DEFAULT NULL,
-            motivo_ml    TEXT DEFAULT NULL
-)
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                nome       TEXT NOT NULL,
+                email      TEXT NOT NULL,
+                telefone   TEXT NOT NULL,
+                ong        TEXT NOT NULL,
+                mensagem   TEXT,
+                score_ml   REAL DEFAULT NULL,
+                alertas_ml TEXT DEFAULT NULL,
+                motivo_ml  TEXT DEFAULT NULL
+            )
         ''')
-        # Migração segura: adiciona colunas novas se o banco já existia
-        for col, tipo in [("alertas_ml", "TEXT"), ("motivo_ml", "TEXT")]:
+
+        # Migração segura: adiciona colunas se o banco já existia
+        for col, tipo in [
+            ("score_ml", "REAL"),
+            ("alertas_ml", "TEXT"),
+            ("motivo_ml", "TEXT")
+        ]:
             try:
                 conn.execute(f"ALTER TABLE voluntarios ADD COLUMN {col} {tipo} DEFAULT NULL")
             except Exception:
-                pass  # coluna já existe
+                pass
+
         conn.commit()
 
 
@@ -53,32 +59,47 @@ def _campos_obrigatorios(dados: dict) -> bool:
 
 @app.route('/api/voluntarios', methods=['GET'])
 def listar_voluntarios():
-    conn  = get_db()
-    rows  = conn.execute('SELECT * FROM voluntarios ORDER BY id').fetchall()
+    conn = get_db()
+    rows = conn.execute('SELECT * FROM voluntarios ORDER BY id').fetchall()
     conn.close()
 
     resultado = []
+
     for r in rows:
         v = dict(r)
 
-        # Renomeia campos ML
-        v.pop('predicao_ml', None)
-        v['motivo'] = v.pop('motivo_ml', None)
-        alertas_raw   = v.pop('alertas_ml', '[]')
-        v['alertas']  = json.loads(alertas_raw) if alertas_raw else []
-
-        # Remove colunas antigas do banco que não são mais usadas
-        for campo_antigo in ('modelo_usado', 'nivel_suspeita', 'alertas_detector',
-                             'score_suspeita', 'rotulo_manual', 'confianca'):
+        # Remove campos antigos, caso ainda existam no banco
+        for campo_antigo in (
+            'predicao_ml',
+            'modelo_usado',
+            'nivel_suspeita',
+            'alertas_detector',
+            'score_suspeita',
+            'rotulo_manual',
+            'confianca'
+        ):
             v.pop(campo_antigo, None)
+
+        # Renomeia campos do ML para o front-end
+        v['motivo'] = v.pop('motivo_ml', None)
+
+        alertas_raw = v.pop('alertas_ml', '[]')
+        try:
+            v['alertas'] = json.loads(alertas_raw) if alertas_raw else []
+        except Exception:
+            v['alertas'] = []
 
         resultado.append(v)
 
     return jsonify(resultado)
-@app.route('/api/voluntarios', methods=['POST'])
+
+
 @app.route('/api/voluntarios', methods=['POST'])
 def cadastrar_voluntario():
     dados = request.get_json()
+
+    if not dados:
+        return jsonify({'erro': 'Nenhum dado enviado.'}), 400
 
     if not _campos_obrigatorios(dados):
         return jsonify({'erro': 'Campos obrigatórios faltando.'}), 400
@@ -101,15 +122,27 @@ def cadastrar_voluntario():
         json.dumps(resultado.get('alertas', []), ensure_ascii=False),
         resultado.get('motivo', ''),
     ))
+
     conn.commit()
     conn.close()
 
-    return jsonify({'mensagem': 'Cadastro realizado com sucesso!', 'ml': resultado}), 201
+    return jsonify({
+        'mensagem': 'Cadastro realizado com sucesso!',
+        'ml': resultado
+    }), 201
+
 
 @app.route('/api/voluntarios/<int:id>', methods=['PUT'])
 def editar_voluntario(id):
     dados = request.get_json()
-    conn  = get_db()
+
+    if not dados:
+        return jsonify({'erro': 'Nenhum dado enviado.'}), 400
+
+    if not _campos_obrigatorios(dados):
+        return jsonify({'erro': 'Campos obrigatórios faltando.'}), 400
+
+    conn = get_db()
 
     if not conn.execute('SELECT id FROM voluntarios WHERE id = ?', (id,)).fetchone():
         conn.close()
@@ -119,46 +152,66 @@ def editar_voluntario(id):
 
     conn.execute('''
         UPDATE voluntarios
-        SET nome=?, email=?, telefone=?, ong=?, mensagem=?,
-        score_ml=?, alertas_ml=?, motivo_ml=?
-        WHERE id=?
+        SET nome = ?,
+            email = ?,
+            telefone = ?,
+            ong = ?,
+            mensagem = ?,
+            score_ml = ?,
+            alertas_ml = ?,
+            motivo_ml = ?
+        WHERE id = ?
     ''', (
-        dados.get('nome'), dados.get('email'),
-        dados.get('telefone'), dados.get('ong'),
+        dados.get('nome'),
+        dados.get('email'),
+        dados.get('telefone'),
+        dados.get('ong'),
         dados.get('mensagem', ''),
         resultado['score_ml'],
         json.dumps(resultado.get('alertas', []), ensure_ascii=False),
         resultado.get('motivo', ''),
         id,
-        id,
     ))
+
     conn.commit()
     conn.close()
-    return jsonify({'mensagem': 'Dados atualizados!', 'ml': resultado})
+
+    return jsonify({
+        'mensagem': 'Dados atualizados!',
+        'ml': resultado
+    })
 
 
 @app.route('/api/voluntarios/<int:id>', methods=['DELETE'])
 def excluir_voluntario(id):
     conn = get_db()
+
     if not conn.execute('SELECT id FROM voluntarios WHERE id = ?', (id,)).fetchone():
         conn.close()
         return jsonify({'erro': 'Voluntário não encontrado.'}), 404
+
     conn.execute('DELETE FROM voluntarios WHERE id = ?', (id,))
     conn.commit()
     conn.close()
+
     return jsonify({'mensagem': 'Excluído com sucesso!'})
 
 
-# ── Estatísticas (opcional, caso o admin use) ─────────────────────────────────
+# ── Estatísticas ──────────────────────────────────────────────────────────────
 
 @app.route('/api/voluntarios/estatisticas', methods=['GET'])
 def estatisticas():
     conn = get_db()
-    total  = conn.execute("SELECT COUNT(*) FROM voluntarios").fetchone()[0]
-    reais  = conn.execute("SELECT COUNT(*) FROM voluntarios WHERE predicao_ml='real'").fetchone()[0]
-    falsos = conn.execute("SELECT COUNT(*) FROM voluntarios WHERE predicao_ml='falso'").fetchone()[0]
+
+    total = conn.execute("SELECT COUNT(*) FROM voluntarios").fetchone()[0]
+    media_score = conn.execute("SELECT AVG(score_ml) FROM voluntarios").fetchone()[0]
+
     conn.close()
-    return jsonify({'total': total, 'reais': reais, 'falsos': falsos})
+
+    return jsonify({
+        'total': total,
+        'media_score': round(media_score or 0, 2)
+    })
 
 
 # ── Front-end ─────────────────────────────────────────────────────────────────
@@ -166,6 +219,7 @@ def estatisticas():
 @app.route('/')
 def index():
     return send_from_directory('public/html', 'index.html')
+
 
 @app.route('/<path:filename>.html')
 def serve_html(filename):
