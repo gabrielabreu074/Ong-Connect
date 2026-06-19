@@ -13,7 +13,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer, util
 
 
-# ── Modelo NLP ────────────────────────────────────────────────────────────────
+# Modelo de Ml usado
 
 _MODELO_NLP = None
 
@@ -29,7 +29,7 @@ def _carregar_modelo():
     return _MODELO_NLP
 
 
-# ── Referências semânticas ────────────────────────────────────────────────────
+# Referências de frases boas e ruins
 
 MENSAGENS_GENUINAS = [
     "Quero ajudar crianças carentes da minha cidade e contribuir com a educação.",
@@ -66,7 +66,7 @@ _EMB_GENUINAS = _modelo.encode(MENSAGENS_GENUINAS, convert_to_tensor=True)
 _EMB_RUINS = _modelo.encode(MENSAGENS_RUINS, convert_to_tensor=True)
 
 
-# ── Listas de validação ───────────────────────────────────────────────────────
+# Listas de validações de emails, nomes etc
 
 DOMINIOS_DESCARTAVEIS = {
     "mailinator.com", "guerrillamail.com", "trashmail.com", "yopmail.com",
@@ -91,7 +91,7 @@ DDDS_VALIDOS = {
 }
 
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+
 
 def _normalizar(texto: str) -> str:
     nfkd = unicodedata.normalize("NFKD", texto)
@@ -101,8 +101,6 @@ def _normalizar(texto: str) -> str:
 def _so_digitos(texto: str) -> str:
     return re.sub(r"\D", "", texto)
 
-
-# ── Score da mensagem usando NLP ──────────────────────────────────────────────
 
 def _score_mensagem(mensagem: str) -> tuple[float, str]:
     texto = mensagem.strip() if mensagem else ""
@@ -132,7 +130,7 @@ def _score_mensagem(mensagem: str) -> tuple[float, str]:
     return round(score, 4), motivo
 
 
-# ── Penalidades de validação ──────────────────────────────────────────────────
+
 
 def _penalidades(dados: dict) -> tuple[float, list[str]]:
     alertas = []

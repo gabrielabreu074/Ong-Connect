@@ -7,7 +7,7 @@ from ml_detector import prever
 
 app = Flask(__name__, static_folder='public', static_url_path='')
 
-# ── Banco de dados ────────────────────────────────────────────────────────────
+# Banco de Dados
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE = os.path.join(BASE_DIR, 'database.db')
 
@@ -55,7 +55,7 @@ def _campos_obrigatorios(dados: dict) -> bool:
     return all(dados.get(c) for c in ("nome", "email", "telefone", "ong"))
 
 
-# ── Rotas da API ──────────────────────────────────────────────────────────────
+# Rotas das API
 
 @app.route('/api/voluntarios', methods=['GET'])
 def listar_voluntarios():
@@ -68,7 +68,7 @@ def listar_voluntarios():
     for r in rows:
         v = dict(r)
 
-        # Remove campos antigos, caso ainda existam no banco
+        # Remove campos antigos caso ainda existam no banco
         for campo_antigo in (
             'predicao_ml',
             'modelo_usado',
@@ -214,7 +214,7 @@ def estatisticas():
     })
 
 
-# ── Front-end ─────────────────────────────────────────────────────────────────
+# Front-end
 
 @app.route('/')
 def index():

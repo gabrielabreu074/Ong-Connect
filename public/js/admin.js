@@ -121,11 +121,12 @@ async function editar(id) {
     const nome     = prompt("Digite o novo nome:", voluntario.nome);
     const telefone = prompt("Digite o novo telefone:", voluntario.telefone);
 
-    if (telefone && telefone.length > 11) {
-        alert("O telefone deve ter no máximo 11 caracteres.");
-        return;
-    }
+const telefoneLimpo = telefone.replace(/\D/g, '');
 
+if (telefoneLimpo.length > 11) {
+    alert("O telefone deve ter no máximo 11 caracteres.");
+    return;
+}
     const ong = prompt("Digite a nova ONG:", voluntario.ong);
 
     if (nome && telefone && ong) {
