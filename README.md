@@ -4,7 +4,7 @@ Sistema web desenvolvido para conectar voluntários a ONGs, permitindo o cadastr
 
 ## Objetivo
 
-Facilitar o processo de recrutamento de voluntários, organizando os cadastros e auxiliando as ONGs na identificação de candidatos mais engajados.
+Facilitar o processo de recrutamento de voluntários, permitindo o cadastro de interessados e a análise automática da qualidade das mensagens enviadas.
 
 ## Tecnologias Utilizadas
 
@@ -43,14 +43,16 @@ As dependências do projeto podem ser instaladas através do arquivo `requiremen
 * Cadastro de voluntários
 * Armazenamento das informações em banco de dados
 * Painel administrativo para visualização dos cadastros
-* Avaliação automática das mensagens enviadas
+* Análise semântica automática das mensagens enviadas
 * Geração de score de qualidade por meio de IA
 
 ## Como o ML Funciona
 
-O sistema utiliza Processamento de Linguagem Natural (NLP) para analisar a mensagem enviada pelo voluntário.
+O sistema utiliza Processamento de Linguagem Natural (NLP) para analisar as mensagens enviadas pelos voluntários.
 
-A mensagem é convertida em representações numéricas (embeddings) por um modelo de IA e comparada semanticamente com exemplos de mensagens genuínas. Com base nessa análise, é gerado um score que representa a qualidade e relevância da mensagem.
+Por meio do modelo Sentence Transformer, o texto é convertido em embeddings (representações numéricas vetoriais). Esses vetores são comparados semanticamente com exemplos previamente definidos de mensagens consideradas relevantes.
+
+A partir dessa comparação, o sistema gera um score de qualidade que auxilia a ONG na avaliação dos cadastros.
 
 ## Diferenciais
 
@@ -68,6 +70,6 @@ A mensagem é convertida em representações numéricas (embeddings) por um mode
 
 ## Autores
 
-**Marcus Vinicius e Gabriel Alan**
+**Marcus Vinicius, Gabriel Alan e cocriação com a Inteligência Artificial**
 
 Projeto acadêmico desenvolvido para aplicação prática de conceitos de Desenvolvimento Web, Banco de Dados e Machine Learning.
