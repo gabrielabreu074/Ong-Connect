@@ -1,10 +1,34 @@
 # ONG Connect
 
-Sistema web desenvolvido para conectar voluntários a ONGs, permitindo o cadastro de interessados e a análise automática das mensagens utilizando Machine Learning.
+Sistema web desenvolvido para conectar voluntários a ONGs, permitindo o cadastro de interessados e a análise automática das mensagens utilizando Machine Learning e Processamento de Linguagem Natural (NLP).
+
+## Acesso ao Projeto
+
+O projeto pode ser executado localmente ou acessado através da plataforma de hospedagem utilizada pela equipe.
+
+**Repositório:**
+
+```
+https://github.com/gabrielabreu074/Ong-Connect
+```
+
+**Aplicação Online:**
+
+```
+https://huggingface.co/spaces/Marcus017/OngConnect
+```
+
+*(Substitua pelos links reais do projeto.)*
+
+---
 
 ## Objetivo
 
-Facilitar o processo de recrutamento de voluntários, permitindo o cadastro de interessados e a análise automática da qualidade das mensagens enviadas.
+O ONG Connect tem como objetivo facilitar o processo de recrutamento de voluntários por organizações não governamentais (ONGs).
+
+A plataforma permite o cadastro de interessados e utiliza técnicas de Machine Learning para analisar automaticamente a qualidade das mensagens enviadas pelos candidatos, auxiliando as ONGs na avaliação dos cadastros recebidos.
+
+---
 
 ## Tecnologias Utilizadas
 
@@ -28,23 +52,18 @@ Facilitar o processo de recrutamento de voluntários, permitindo o cadastro de i
 * NumPy
 * Scikit-Learn
 
-## Requisitos
-
-Para executar o projeto localmente é necessário ter instalado:
-
-- Python 3.10 ou superior
-- Git
-- Pip (gerenciador de pacotes do Python)
-
-As dependências do projeto podem ser instaladas através do arquivo `requirements.txt`.
+---
 
 ## Funcionalidades
 
 * Cadastro de voluntários
 * Armazenamento das informações em banco de dados
 * Painel administrativo para visualização dos cadastros
-* Análise semântica automática das mensagens enviadas
+* Análise semântica automática das mensagens
 * Geração de score de qualidade por meio de IA
+* Exibição de alertas para auxiliar a análise dos administradores
+
+---
 
 ## Como o ML Funciona
 
@@ -54,22 +73,146 @@ Por meio do modelo Sentence Transformer, o texto é convertido em embeddings (re
 
 A partir dessa comparação, o sistema gera um score de qualidade que auxilia a ONG na avaliação dos cadastros.
 
+---
+
+## Requisitos
+
+Para executar o projeto localmente é necessário possuir:
+
+* Python 3.10 ou superior
+* Git
+* Pip
+
+---
+
+## Como Executar o Projeto
+
+### 1. Clonar o repositório
+
+```bash
+git clone https://github.com/seu-usuario/ong-connect.git
+cd ong-connect
+```
+
+### 2. Criar ambiente virtual
+
+```bash
+python -m venv .venv
+```
+
+### 3. Ativar ambiente virtual
+
+Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+Linux/Mac:
+
+```bash
+source .venv/bin/activate
+```
+
+### 4. Instalar dependências
+
+```bash
+pip install -r requirements.txt
+```
+
+### 5. Executar a aplicação
+
+```bash
+python app.py
+```
+
+A aplicação ficará disponível em:
+
+```txt
+http://localhost:7860
+```
+
+---
+
+## Estrutura do Projeto
+
+```
+## Estrutura do Projeto
+
+ONG-CONNECT/
+│
+├── app.py                 # Backend principal (Flask e rotas da API)
+├── ml_detector.py         # Sistema de Machine Learning e NLP
+├── database.db            # Banco de dados SQLite
+├── requirements.txt       # Dependências do projeto
+├── Dockerfile             # Configuração para deploy com Docker
+├── README.md              # Documentação do projeto
+├── .gitignore             # Arquivos ignorados pelo Git
+│
+├── public/
+│   │
+│   ├── assets/            # Imagens, ícones e recursos visuais
+│   │
+│   ├── css/
+│   │   ├── admin.css      
+│   │   ├── ajude.css      
+│   │   ├── apa.css        
+│   │   ├── casa.css      
+│   │   ├── glpv.css      
+│   │   ├── ongs.css      
+│   │   ├── pontes.css     
+│   │   ├── sal.css        
+│   │   ├── style.css      
+│   │   └── voluntario.css 
+│   │
+│   ├── html/
+│   │   ├── admin.html       
+│   │   ├── ajude.html       
+│   │   ├── apa.html       
+│   │   ├── casa.html       
+│   │   ├── glpv.html       
+│   │   ├── index.html  
+│   │   ├── ongs.html        
+│   │   ├── pontes.html      
+│   │   ├── sal.html       
+│   │   └── voluntario.html  
+│   │
+│   └── js/
+│       ├── admin.js       
+│       ├── ongs.js        
+│       ├── script.js
+│       └── volun.js      
+│
+├── .venv/                # Ambiente virtual Python
+└── __pycache__/          # Arquivos temporários do Python
+```
+
+
+
+---
+
 ## Diferenciais
 
-* Utilização de Machine Learning aplicado a um problema real
-* Análise inteligente de mensagens de voluntários
+* Aplicação prática de Machine Learning em um cenário real
+* Utilização de NLP para análise textual
+* Integração entre frontend, backend e banco de dados
 * Interface simples e intuitiva
-* Auxílio às ONGs na organização e avaliação de inscrições
+* Auxílio à tomada de decisão das ONGs
+
+---
 
 ## Resultados
 
-* Sistema web totalmente funcional
-* Integração entre frontend, backend e banco de dados
-* Implementação de NLP para análise textual
-* Geração automática de avaliações para os cadastros realizados
+* Sistema web funcional
+* Integração completa entre frontend e backend
+* Persistência de dados utilizando SQLite
+* Implementação de NLP para análise de mensagens
+* Geração automática de score para auxiliar a avaliação de voluntários
+
+---
 
 ## Autores
 
-**Marcus Vinicius, Gabriel Alan e cocriação com a Inteligência Artificial**
+**Marcus Vinicius e Gabriel Alan**
 
-Projeto acadêmico desenvolvido para aplicação prática de conceitos de Desenvolvimento Web, Banco de Dados e Machine Learning.
+Projeto acadêmico desenvolvido para aplicação prática de conceitos de Desenvolvimento Web, Banco de Dados e Machine Learning, com apoio de ferramentas de Inteligência Artificial durante o processo de desenvolvimento.
