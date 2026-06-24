@@ -18,7 +18,7 @@ https://github.com/gabrielabreu074/Ong-Connect
 https://huggingface.co/spaces/Marcus017/OngConnect
 ```
 
-*(Substitua pelos links reais do projeto.)*
+
 
 ---
 
